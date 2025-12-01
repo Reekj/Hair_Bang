@@ -5,11 +5,13 @@
       <!-- Left: Logo -->
       <div class="flex-shrink-0">
         <div class=" text-white flex items-center justify-center font-bold text-lg">
+          <RouterLink to="/">
           <LazyImage 
             src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/logo.png" 
             alt="HairBang Logo" 
             class="h-[57px] w-[113px]"
           />
+          </RouterLink>
         </div>
       </div>
 
