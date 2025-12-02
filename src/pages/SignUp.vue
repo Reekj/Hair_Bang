@@ -103,6 +103,10 @@
   
 <script setup>
   import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+
+const router = useRouter();
+
 
   const name = ref('');
   const email = ref('');
@@ -139,6 +143,7 @@
       console.log('Registration successful:', data);
       alert('Account created successfully! You can now login.');
       // router.push('/login')
+      router.push('/login');
 
     } catch (err) {
       console.error('Registration error:', err);
