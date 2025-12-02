@@ -3,9 +3,9 @@
   
       <!-- HERO SECTION -->
       <section
-        class="w-full bg-[#F6E7DF] border-b pt-[70px] pb-[70px] flex justify-center"
+        class="w-full bg-[#F6E7DF] border-b pt-[70px] pb-[70px] flex justify-center relative"
       >
-        <div class="max-w-[1440px] w-full flex items-center justify-between px-6 gap-[59px]">
+        <div class="max-w-[1440px] w-full flex items-center justify-between px-6 gap-[59px] relative">
 
           <!-- LEFT TEXT BLOCK -->
           <div class="max-w-[597px] space-y-10">
@@ -27,16 +27,18 @@
           </div>
 
           <!-- RIGHT: CAROUSEL -->
-          <div class="border border-gray-300 overflow-hidden w-[602px] h-[774px] relative rounded-md">
-            
-            <!-- SLIDER WRAPPER -->
-            <div 
+          <div class="w-[602px] h-[774px] overflow-hidden relative border border-gray-300 rounded-md">
+            <div
               class="flex transition-transform duration-700"
               :style="{ transform: `translateX(-${currentIndex * 100}%)` }"
             >
-              <div v-for="n in 4" :key="n" class="w-[602px] h-[774px] flex-shrink-0">
+              <div
+                v-for="(img, index) in images"
+                :key="index"
+                class="w-[602px] h-[774px] flex-shrink-0"
+              >
                 <LazyImage
-                  src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/heroimg.jpg"
+                  :src="img"
                   alt="Hero Wig"
                   class="w-full h-full object-cover"
                 />
@@ -46,7 +48,7 @@
             <!-- DOTS -->
             <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
               <span
-                v-for="(dot, i) in 4"
+                v-for="(img, i) in images"
                 :key="i"
                 @click="currentIndex = i"
                 class="w-3 h-3 rounded-full cursor-pointer transition"
@@ -57,6 +59,7 @@
 
         </div>
       </section>
+
 
   
       <!-- OUR COLLECTIONS SECTION -->
@@ -286,15 +289,22 @@
   </template>
   
 <script setup>
-  import { ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
-  const currentIndex = ref(0)
+const images = [
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/heroimg.jpg",
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/dummywig1.jpeg",
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/dummywig2.jpeg",
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/dummywig3.jpeg"
+]
 
-  onMounted(() => {
-    setInterval(() => {
-      currentIndex.value = (currentIndex.value + 1) % 4
-    }, 4000) // Auto-slide every 4s
-  })
+const currentIndex = ref(0)
+
+onMounted(() => {
+  setInterval(() => {
+    currentIndex.value = (currentIndex.value + 1) % images.length
+  }, 4000) // auto-slide every 4s
+})
 </script>
 
   
