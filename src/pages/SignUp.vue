@@ -102,51 +102,46 @@
   </template>
   
 <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+const name = ref('');
+const email = ref('');
+const password = ref('');
 
-  const name = ref('');
-  const email = ref('');
-  const password = ref('');
+const API_URL = "https://wig-api.onrender.com/api/auth/register";
 
-  // Use your Render backend URL directly
-  const API_URL = "https://wig-api.onrender.com/api/auth/register";
+async function handleRegister() {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name.value,
+        email: email.value,
+        password: password.value
+      })
+    });
 
-  async function handleRegister() {
-    try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: name.value,
-          email: email.value,
-          password: password.value
-        })
-      });
-
-      // Log the raw response for debugging
-      const text = await res.text();
-      console.log('Response:', text);
-
-      if (!res.ok) {
-        alert(`Registration failed: ${text}`);
-        return;
-      }
-
-      const data = JSON.parse(text);
-      console.log('Registration successful:', data);
-      alert('Account created successfully! You can now login.');
-      // router.push('/login')
-      router.push('/login');
-
-    } catch (err) {
-      console.error('Registration error:', err);
-      alert('Something went wrong. Please try again.');
+    if (!res.ok) {
+      const err = await res.text();
+      alert("Registration failed: " + err);
+      return;
     }
+
+    // Fast parse
+    const data = await res.json();
+
+    alert("Account created successfully! Redirecting to login...");
+
+    router.push('/login');
+
+  } catch (error) {
+    alert("Network error. Please try again.");
+    console.error(error);
   }
+}
 </script>
+
