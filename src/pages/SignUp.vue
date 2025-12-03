@@ -123,10 +123,7 @@ async function handleRegister() {
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': '*/*'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: name.value,
         email: email.value,
@@ -134,19 +131,16 @@ async function handleRegister() {
       })
     });
 
-    const text = await res.text();
-    console.log('Response:', text);
-
     if (!res.ok) {
       alert(`Registration failed: ${text}`);
       return;
     }
 
-    const data = JSON.parse(text);
-    console.log('Registration successful:', data);
-    alert('Account created successfully! Redirecting to login...');
-    
-    // Redirect to login page after successful registration
+    // Fast parse
+    const data = await res.json();
+
+    alert("Account created successfully! Redirecting to login...");
+
     router.push('/login');
 
   } catch (err) {
@@ -155,3 +149,4 @@ async function handleRegister() {
   }
 }
 </script>
+
