@@ -6,6 +6,7 @@ import HairCollection from '../pages/HairCollection.vue'
 import Accessories from '../pages/Accessories.vue'
 import Jeans from '../pages/Jeans.vue'
 import ProductDetails from '../pages/ProductDetails.vue'
+import Admin from '../pages/Admin.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -19,6 +20,11 @@ const routes = [
     name: 'ProductDetails',
     component: () => import('../pages/ProductDetails.vue'),
     props: true
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin
   }
   
   // add other routes here

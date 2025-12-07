@@ -98,9 +98,14 @@
       <!-- Already have an account link -->
       <p class="text-center text-sm text-[#6F3E2C] mt-4">
         Already have an account?
-        <a href="/login" class="text-[#B0431A] font-semibold hover:underline">
+        <RouterLink to="/login"
+          class="text-[#B0431A] font-semibold hover:underline"
+        >
+          
           Sign in
-        </a>
+        
+        </RouterLink>
+        
       </p>
 
     </div>

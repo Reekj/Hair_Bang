@@ -58,19 +58,39 @@
             v-if="showDropdown"
             class="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border py-2 z-50"
           >
-            <RouterLink
-              to="/signup"
-              class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
-            >
-              Register
-            </RouterLink>
-
-            <RouterLink
-              to="/login"
-              class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
-            >
-              Login
-            </RouterLink>
+            <template v-if="isLoggedIn">
+              <div class="px-4 py-2 text-sm text-[#333] border-b">
+                <p class="font-semibold">{{ user?.name }}</p>
+                <p class="text-xs text-gray-500">{{ user?.email }}</p>
+              </div>
+              <RouterLink
+                v-if="user?.isAdmin"
+                to="/admin"
+                class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Admin Dashboard
+              </RouterLink>
+              <button
+                @click="handleLogout"
+                class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Logout
+              </button>
+            </template>
+            <template v-else>
+              <RouterLink
+                to="/signup"
+                class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Register
+              </RouterLink>
+              <RouterLink
+                to="/login"
+                class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Login
+              </RouterLink>
+            </template>
           </div>
         </div>
 
@@ -134,12 +154,54 @@
 
         <!-- Mobile Icons -->
         <div class="flex items-center justify-start space-x-6 pt-2">
-          <RouterLink to="/signup">
-            <img
-              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/userv.png"
-              class="w-5 h-5"
-            />
-          </RouterLink>
+          <!-- User Icon with Dropdown -->
+        <div class="relative" @click="toggleDropdown" ref="dropdownWrapper">
+          <img
+            src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/userv.png"
+            alt="User"
+            class="w-[15px] h-[15px] cursor-pointer"
+          />
+
+          <!-- Dropdown Menu -->
+          <div
+            v-if="showDropdown"
+            class="absolute left-0 mt-2 w-40 bg-white shadow-lg rounded-md border py-2 z-50"
+          >
+            <template v-if="isLoggedIn">
+              <div class="px-4 py-2 text-sm text-[#333] border-b">
+                <p class="font-semibold">{{ user?.name }}</p>
+                <p class="text-xs text-gray-500">{{ user?.email }}</p>
+              </div>
+              <RouterLink
+                v-if="user?.isAdmin"
+                to="/admin"
+                class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Admin Dashboard
+              </RouterLink>
+              <button
+                @click="handleLogout"
+                class="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Logout
+              </button>
+            </template>
+            <template v-else>
+              <RouterLink
+                to="/signup"
+                class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Register
+              </RouterLink>
+              <RouterLink
+                to="/login"
+                class="block px-4 py-2 hover:bg-gray-100 text-sm text-[#333]"
+              >
+                Login
+              </RouterLink>
+            </template>
+          </div>
+        </div>
           <RouterLink to="/signup">
             <img
               src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
@@ -159,15 +221,29 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import { onMounted, onBeforeUnmount } from "vue"
+import { useAuth } from "../stores/auth.js"
+
+const { user, isLoggedIn, logout, restoreFromLocalStorage } = useAuth()
+
+// Restore user from localStorage on component mount
+onMounted(() => {
+  restoreFromLocalStorage()
+})
 
 const showDropdown = ref(false)
 const dropdownWrapper = ref(null)
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
+}
+
+const handleLogout = () => {
+  logout()
+  showDropdown.value = false
+  window.location.href = "/"
 }
 
 // Close dropdown when clicking outside
@@ -184,7 +260,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleClickOutside)
 })
-
 
 const searchQuery = ref("");
 const router = useRouter();
