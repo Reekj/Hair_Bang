@@ -55,8 +55,8 @@
               required
             >
               <option value="" disabled>Select a category</option>
-              <option v-for="cat in categories" :key="cat" :value="cat">
-                {{ cat }}
+              <option v-for="cat in categories" :key="cat._id" :value="cat._id">
+                {{ cat.name }}
               </option>
             </select>
           </div>
@@ -109,7 +109,10 @@
             <td class="border p-2">{{ p.name }}</td>
             <td class="border p-2">₦{{ p.price }}</td>
             <td class="border p-2">{{ p.description }}</td>
-            <td class="border p-2">{{ p.category }}</td>
+            <td class="border p-2">
+              {{ p.category?.name || "No Category" }}
+            </td>
+
             <td class="border p-2 space-x-2">
               <button
                 @click="editProduct(p)"
@@ -146,7 +149,7 @@ const loading = ref(false);
 const error = ref(null);
 const editMode = ref(false);
 const editingId = ref(null);
-const categories = ["Wigs", "Jeans", "Hair Accessories"];
+const categories = ref([]);
 
 // Form state
 const form = ref({
@@ -170,6 +173,15 @@ const loadProducts = async () => {
   }
 };
 
+const loadCategories = async () => {
+  try {
+    const res = await axios.get("https://wig-api.onrender.com/api/categories");
+    categories.value = res.data; // must return [{ _id, name, slug }]
+  } catch (err) {
+    console.error("Failed to load categories");
+  }
+};
+
 // Add product
 const addProduct = async () => {
   try {
@@ -190,7 +202,13 @@ const addProduct = async () => {
 const editProduct = (p) => {
   editMode.value = true;
   editingId.value = p._id;
-  form.value = { ...p };
+  form.value = {
+    name: p.name,
+    price: p.price,
+    image: p.image,
+    description: p.description,
+    category: p.category?._id || "",
+  };
 };
 
 // Cancel editing
@@ -269,6 +287,7 @@ const handleFileUpload = async (event) => {
 };
 
 onMounted(loadProducts);
+onMounted(loadCategories);
 </script>
 
 <style>
