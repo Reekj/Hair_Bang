@@ -52,9 +52,9 @@
             <h3 class="font-medium text-lg">Customer Services</h3>
             <ul class="space-y-6 text-sm opacity-90">
                 <li><RouterLink to="/shipping">Shipping</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Return & Refund</a></li>
+                <li><RouterLink to="/refund" class="hover:opacity-60">Return & Refund</RouterLink></li>
                 <li><RouterLink to="/privacy">Privacy & Policy</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Terms & Conditions</a></li>
+                <li><RouterLink to="/terms-condition" class="hover:opacity-60">Terms & Conditions</RouterLink></li>
                 <li><a href="#" class="hover:opacity-60">Order FAQs</a></li>
                 <li><a href="#" class="hover:opacity-60">My Wishlist</a></li>
             </ul>
