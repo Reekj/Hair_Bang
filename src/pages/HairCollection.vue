@@ -63,17 +63,16 @@
     >
       <div
         v-for="item in products"
-        :key="item.id"
+        :key="item._id"
         class="bg-white rounded-xl shadow-sm flex flex-col p-2"
       >
-        <!-- Image Container -->
+        <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 mb-4">
           <img 
             :src="item.image" 
             class="w-full h-full object-cover rounded-xl" 
           />
 
-          <!-- Heart Icon -->
           <button class="absolute top-3 right-3 bg-none p-2 rounded-full">
             <img 
               src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
@@ -82,31 +81,27 @@
           </button>
         </div>
 
-        <!-- Title -->
         <h3 class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4">
-          {{ item.title }}
+          {{ item.name }}
         </h3>
 
-        <!-- Small Description -->
         <p class="text-[#6A2E18] text-sm sm:text-[14px] mt-1 px-4">
           Premium human hair collection
         </p>
 
-        <!-- Price -->
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
           ${{ item.price }}
         </p>
 
-        <!-- ⭐ View Details Link -->
         <router-link
-          :to="`/product/${item.id}`"
+          :to="`/product/${item._id}`"
           class="text-[#6A2E18] underline text-sm sm:text-base mt-1 px-4"
         >
           View Details
         </router-link>
 
-        <!-- Add to Cart -->
         <button
+          @click="addToCart(item._id)"
           class="mt-auto mx-4 mb-4 rounded-xl text-white text-sm sm:text-base font-medium h-10 sm:h-12 w-auto"
           style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
         >
@@ -119,22 +114,61 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "HairCollection",
 
   data() {
     return {
-      products: [
-        { id: 1, title: "Luxury 18” Body Wave Raw Hair", price: 299, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png" },
-        { id: 2, title: "Luxury 22” Loose Deepwave", price: 180, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair2.png" },
-        { id: 3, title: "Luxury 6” Water Curly 13x4", price: 120, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair3.jpg" },
-        { id: 4, title: "Luxury 22” Loose Deepwave", price: 180, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair4.png" },
-        { id: 5, title: "Luxury 6” Water Curly 13”x4”", price: 120, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair4.png" },
-        { id: 6, title: "Luxury 22” Loose Deepwave", price: 180, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair2.png" },
-        { id: 7, title: "Luxury 18” Body Wave Raw Hair", price: 299, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png" },
-        { id: 8, title: "Luxury 6” Water Curly 13x4", price: 120, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair3.jpg" },
-      ],
+      products: [],
     };
+  },
+
+  async mounted() {
+    try {
+      const response = await axios.get("https://wig-api.onrender.com/api/products");
+      console.log("API RESPONSE:", response.data);
+
+      // Try all possible response formats
+      this.products =
+        response.data.products ||
+        response.data.data ||
+        response.data.items ||
+        response.data ||
+        [];
+
+      console.log("PRODUCTS SET TO:", this.products);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+    }
+  },
+
+
+  methods: {
+    async addToCart(productId) {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("You need to log in first.");
+        return;
+      }
+
+      try {
+        await axios.post(
+          "https://wig-api.onrender.com/api/cart/add",
+          { productId },
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+
+        alert("Added to cart!");
+      } catch (err) {
+        console.error("Add to cart failed:", err);
+        alert("Error adding to cart.");
+      }
+    },
   },
 };
 </script>
@@ -144,7 +178,6 @@ export default {
   @apply bg-white border border-gray-300 text-black text-sm rounded-md py-2 px-3;
 }
 
-/* Prevent ANY overflow issues */
 * {
   max-width: 100%;
   box-sizing: border-box;

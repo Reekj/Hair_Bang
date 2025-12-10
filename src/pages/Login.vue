@@ -137,11 +137,18 @@ async function handleLogin() {
 
     const data = await res.json();
 
-    // Set user data in auth store
-    setUser(data);
-    localStorage.setItem("user", JSON.stringify(data));
+    // Save token for authenticated requests
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
 
-    // Redirect based on user role
+    // Save user info
+    localStorage.setItem("user", JSON.stringify(data.user || data));
+
+    // Set user in your store
+    setUser(data);
+
+    // Redirect
     if (data.isAdmin) {
       alert("Admin login successful! Redirecting to dashboard...");
       router.push("/admin");
@@ -149,6 +156,7 @@ async function handleLogin() {
       alert("Login successful! Redirecting to home...");
       router.push("/");
     }
+
   } catch (e) {
     console.error(e);
     alert("An error occurred during login. Please try again.");
