@@ -38,6 +38,17 @@
             />
           </div>
 
+          <div>
+            <label class="block font-semibold">Quantity</label>
+            <input
+              v-model.number="form.quantity"
+              type="number"
+              class="w-full border p-2 rounded"
+              min="0"
+              required
+            />
+          </div>
+
           <div class="md:col-span-2">
             <label class="block font-semibold">Description</label>
             <textarea
@@ -97,6 +108,7 @@
             <th class="border p-2">Price</th>
             <th class="border p-2">Description</th>
             <th class="border p-2">Category</th>
+            <th class="border p-2">Stock</th>
             <th class="border p-2">Actions</th>
           </tr>
         </thead>
@@ -111,6 +123,20 @@
             <td class="border p-2">{{ p.description }}</td>
             <td class="border p-2">
               {{ p.category?.name || "No Category" }}
+            </td>
+            <td class="border p-2">
+              <span class="font-semibold">Qty: {{ p.quantity }}</span
+              ><br />
+              <span
+                :class="{
+                  'text-green-600': p.status === 'in stock',
+                  'text-yellow-600': p.status === 'low stock',
+                  'text-red-600': p.status === 'out of stock',
+                  'font-semibold': true,
+                }"
+              >
+                {{ p.status }}
+              </span>
             </td>
 
             <td class="border p-2 space-x-2">
@@ -159,6 +185,7 @@ const form = ref({
   image: "",
   description: "",
   category: "",
+  quantity: 0,
 });
 
 // Load products
@@ -210,6 +237,7 @@ const editProduct = (p) => {
     image: p.image,
     description: p.description,
     category: p.category?._id || "",
+    quantity: p.quantity || 0,
   };
 };
 
@@ -267,6 +295,7 @@ const resetForm = () => {
     image: "",
     description: "",
     category: "",
+    quantity: 0,
   };
 };
 const handleFileUpload = async (event) => {

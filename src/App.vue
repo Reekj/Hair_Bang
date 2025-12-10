@@ -2,6 +2,7 @@
 import Header from './components/Header.vue'
 import Footer from './components/Footer.vue'
 import Toast from './components/Toast.vue'
+import WhatsAppChat from './components/WhatsAppChat.vue';
 
 
 
@@ -12,6 +13,7 @@ import Toast from './components/Toast.vue'
   <Header />
   <router-view />
   <Toast  />
+  <WhatsAppChat />
   <Footer />
 </template>
 
