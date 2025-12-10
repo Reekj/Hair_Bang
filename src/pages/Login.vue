@@ -103,6 +103,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuth } from "../stores/auth.js";
+import { toast } from "../stores/toast.js";
 
 const router = useRouter();
 const { setUser } = useAuth();
@@ -114,7 +115,7 @@ const API_URL = "https://wig-api.onrender.com/api/auth/login";
 
 async function handleLogin() {
   if (!email.value || !password.value) {
-    alert("Please enter email and password");
+    toast.show("Please enter both email and password", "error");
     return;
   }
 
@@ -131,7 +132,7 @@ async function handleLogin() {
     });
 
     if (!res.ok) {
-      alert("Login failed: Invalid email or password");
+      toast.show("Invalid email or password", "error");
       return;
     }
 
@@ -143,15 +144,22 @@ async function handleLogin() {
 
     // Redirect based on user role
     if (data.isAdmin) {
-      alert("Admin login successful! Redirecting to dashboard...");
-      router.push("/admin");
+      toast.show(
+        "Admin login successful! Redirecting to admin panel...",
+        "success"
+      );
+      setTimeout(() => {
+        router.push("/admin");
+      }, 2000);
     } else {
-      alert("Login successful! Redirecting to home...");
-      router.push("/");
+      toast.show("Login successful! Redirecting to homepage...", "success");
+      setTimeout(() => {
+        router.push("/");
+      }, 2000);
     }
   } catch (e) {
     console.error(e);
-    alert("An error occurred during login. Please try again.");
+    toast.show("An error occurred during login. Please try again.", "error");
   } finally {
     isLoading.value = false;
   }

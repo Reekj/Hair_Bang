@@ -139,6 +139,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { toast } from "../stores/toast";
 
 // API URLS
 const BASE_URL = "https://wig-api.onrender.com/api/products";
@@ -192,6 +193,7 @@ const addProduct = async () => {
       },
     });
     products.value.push(res.data.product); // Add newly created item with _id
+    toast.show("Product added successfully", "success");
     resetForm();
   } catch (err) {
     alert("Failed to add product");
@@ -233,8 +235,9 @@ const updateProduct = async () => {
     if (index !== -1) products.value[index] = res.data.product;
 
     cancelEdit();
+    toast.show("Product updated successfully", "success");
   } catch (err) {
-    alert("Failed to update product");
+    toast.show("Failed to update product", "error");
   }
 };
 
@@ -250,8 +253,9 @@ const deleteProduct = async (id) => {
       },
     });
     products.value = products.value.filter((p) => p._id !== id);
+    toast.show("Product deleted successfully", "success");
   } catch (err) {
-    alert("Failed to delete product");
+    toast.show("Failed to delete product", "error");
   }
 };
 
@@ -282,7 +286,7 @@ const handleFileUpload = async (event) => {
 
     form.value.image = res.data.secure_url; // auto-fill image URL
   } catch (err) {
-    alert("Image upload failed");
+    toast.show("Image upload failed", "error");
   }
 };
 
