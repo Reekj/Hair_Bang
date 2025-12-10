@@ -17,6 +17,8 @@ const routes = [
   { path: '/accessories', name: 'Accessories', component: Accessories },
   { path: '/jeans', name: 'Jeans', component: Jeans },
   { path: '/cart', name: 'Cart', component: Cart },
+  { path: '/shipping', name: 'Shipping', component: () => import('../pages/Shipping.vue') },
+  { path: '/privacy', name: 'Privacy', component: () => import('../pages/Privacy.vue') },
   {
     path: '/product/:id',
     name: 'ProductDetails',
