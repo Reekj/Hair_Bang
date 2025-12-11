@@ -50,6 +50,7 @@
           type="text" 
           placeholder="Search" 
           class="w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm"
+          v-model="search"
         />
         <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-60">🔍</span>
       </div>
@@ -62,7 +63,7 @@
              gap-6 sm:gap-8"
     >
       <div
-        v-for="item in products"
+        v-for="item in filteredProducts"
         :key="item._id"
         class="bg-white rounded-xl shadow-sm flex flex-col p-2"
       >
@@ -71,6 +72,7 @@
           <img 
             :src="item.image" 
             class="w-full h-full object-cover rounded-xl" 
+            :alt="item.name"
           />
 
           <button class="absolute top-3 right-3 bg-none p-2 rounded-full">
@@ -86,7 +88,7 @@
         </h3>
 
         <p class="text-[#6A2E18] text-sm sm:text-[14px] mt-1 px-4">
-          Premium human hair collection
+          {{ item.description || 'Premium human hair collection' }}
         </p>
 
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
@@ -108,6 +110,11 @@
           Add to Cart
         </button>
       </div>
+
+      <div v-if="loading" class="col-span-full text-center text-gray-700">Loading products...</div>
+      <div v-if="!loading && filteredProducts.length === 0" class="col-span-full text-center text-gray-500">
+        No wigs available.
+      </div>
     </section>
 
   </div>
@@ -117,56 +124,69 @@
 import axios from "axios";
 
 export default {
-  name: "HairCollection",
-
+  name: "WigsPage",
   data() {
     return {
       products: [],
+      loading: true,
+      error: null,
+      search: ""
     };
   },
-
-  async mounted() {
-    try {
-      const response = await axios.get("https://wig-api.onrender.com/api/products");
-      console.log("API RESPONSE:", response.data);
-
-      // Try all possible response formats
-      this.products =
-        response.data.products ||
-        response.data.data ||
-        response.data.items ||
-        response.data ||
-        [];
-
-      console.log("PRODUCTS SET TO:", this.products);
-    } catch (err) {
-      console.error("Failed to fetch products:", err);
+  computed: {
+    filteredProducts() {
+      if (!this.search) return this.products;
+      const q = this.search.toLowerCase().trim();
+      return this.products.filter(p =>
+        (p.name || "").toLowerCase().includes(q) ||
+        (p.description || "").toLowerCase().includes(q)
+      );
     }
   },
-
-
+  async mounted() {
+    await this.loadProducts();
+  },
   methods: {
+    async loadProducts() {
+      this.loading = true;
+      try {
+        const res = await axios.get("https://wig-api.onrender.com/api/products");
+        const allProducts = res.data.products || res.data || [];
+
+        // Filter by category slug (wigs)
+        this.products = allProducts.filter(
+          (p) => p.category?.slug === "wigs"
+        );
+      } catch (err) {
+        console.error(err);
+        this.error = "Failed to load products.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
     async addToCart(productId) {
       const token = localStorage.getItem("token");
-
-      if (!token) {
-        alert("You need to log in first.");
-        return;
-      }
+      if (!token) return alert("You need to log in first.");
 
       try {
-        await axios.post(
+        const res = await axios.post(
           "https://wig-api.onrender.com/api/cart/add",
           { productId },
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        alert("Added to cart!");
+        // Prefer backend success flag/message if available
+        if (res.data?.success || res.status === 200) {
+          alert(res.data?.message || "Added to cart!");
+          // Broadcast an event so Cart page can refresh
+          window.dispatchEvent(new Event("cart-updated"));
+        } else {
+          alert(res.data?.message || "Failed to add to cart.");
+        }
       } catch (err) {
         console.error("Add to cart failed:", err);
-        alert("Error adding to cart.");
+        alert("Failed to add to cart.");
       }
     },
   },
