@@ -115,7 +115,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { toast } from '../stores/Toast.js';
+import { toast } from '../stores/toast.js';
 
 const router = useRouter();
 const name = ref('');
