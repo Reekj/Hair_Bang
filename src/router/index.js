@@ -19,6 +19,8 @@ const routes = [
   { path: '/cart', name: 'Cart', component: Cart },
   { path: '/shipping', name: 'Shipping', component: () => import('../pages/Shipping.vue') },
   { path: '/privacy', name: 'Privacy', component: () => import('../pages/Privacy.vue') },
+  { path: '/terms-condition', name: 'TermsAndCondition', component: () => import('../pages/TermsAndConditions.vue') },
+  { path: '/refund', name: 'RefundPolicy', component: () => import('../pages/RefundPolicy.vue') },
   {
     path: '/product/:id',
     name: 'ProductDetails',
