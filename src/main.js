@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import { MotionPlugin } from '@vueuse/motion'
 import './assets/main.css' 
 import LazyImage from './components/LazyImage.vue'
+import Toast from "./components/Toast.vue"
 
 
 const app = createApp(App)
@@ -16,4 +17,5 @@ app.use(MotionPlugin)
 app.use(router) 
 app.component('LazyImage', LazyImage)
 app.mount('#app')
+app.use(Toast)
 

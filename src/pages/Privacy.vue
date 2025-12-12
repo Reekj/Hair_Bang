@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto px-4 py-10 text-gray-800 leading-relaxed">
+  <div class="p-6 max-w-3xl mx-auto text-gray-800 space-y-6">
     <h1 class="text-3xl font-bold mb-4">Privacy Policy</h1>
     <p class="text-sm mb-6">Last updated: February 07, 2025</p>
 
@@ -136,7 +136,7 @@
 
     <p>If you have any questions, you can contact us at:</p>
 
-    <p class="mt-2 font-semibold">Email: shop@herhairbang.com</p>
+    <p class="font-semibold mt-2">Email: <a href="mailto:shop@herhairbang.com" class="text-blue-600 underline">shop@herhairbang.com</a></p>
   </div>
 </template>
 

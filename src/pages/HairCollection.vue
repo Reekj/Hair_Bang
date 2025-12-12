@@ -50,6 +50,7 @@
           type="text" 
           placeholder="Search" 
           class="w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm"
+          v-model="search"
         />
         <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-60">🔍</span>
       </div>
@@ -62,18 +63,18 @@
              gap-6 sm:gap-8"
     >
       <div
-        v-for="item in products"
-        :key="item.id"
+        v-for="item in filteredProducts"
+        :key="item._id"
         class="bg-white rounded-xl shadow-sm flex flex-col p-2"
       >
-        <!-- Image Container -->
+        <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 mb-4">
           <img 
             :src="item.image" 
             class="w-full h-full object-cover rounded-xl" 
+            :alt="item.name"
           />
 
-          <!-- Heart Icon -->
           <button class="absolute top-3 right-3 bg-none p-2 rounded-full">
             <img 
               src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
@@ -82,36 +83,37 @@
           </button>
         </div>
 
-        <!-- Title -->
         <h3 class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4">
-          {{ item.title }}
+          {{ item.name }}
         </h3>
 
-        <!-- Small Description -->
         <p class="text-[#6A2E18] text-sm sm:text-[14px] mt-1 px-4">
-          Premium human hair collection
+          {{ item.description || 'Premium human hair collection' }}
         </p>
 
-        <!-- Price -->
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
           ${{ item.price }}
         </p>
 
-        <!-- ⭐ View Details Link -->
         <router-link
-          :to="`/product/${item.id}`"
+          :to="`/product/${item._id}`"
           class="text-[#6A2E18] underline text-sm sm:text-base mt-1 px-4"
         >
           View Details
         </router-link>
 
-        <!-- Add to Cart -->
         <button
+          @click="addToCart(item._id)"
           class="mt-auto mx-4 mb-4 rounded-xl text-white text-sm sm:text-base font-medium h-10 sm:h-12 w-auto"
           style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
         >
           Add to Cart
         </button>
+      </div>
+
+      <div v-if="loading" class="col-span-full text-center text-gray-700">Loading products...</div>
+      <div v-if="!loading && filteredProducts.length === 0" class="col-span-full text-center text-gray-500">
+        No wigs available.
       </div>
     </section>
 
@@ -119,22 +121,74 @@
 </template>
 
 <script>
-export default {
-  name: "HairCollection",
+import axios from "axios";
 
+export default {
+  name: "WigsPage",
   data() {
     return {
-      products: [
-        { id: 1, title: "Luxury 18” Body Wave Raw Hair", price: 299, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png" },
-        { id: 2, title: "Luxury 22” Loose Deepwave", price: 180, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair2.png" },
-        { id: 3, title: "Luxury 6” Water Curly 13x4", price: 120, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair3.jpg" },
-        { id: 4, title: "Luxury 22” Loose Deepwave", price: 180, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair4.png" },
-        { id: 5, title: "Luxury 6” Water Curly 13”x4”", price: 120, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair4.png" },
-        { id: 6, title: "Luxury 22” Loose Deepwave", price: 180, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair2.png" },
-        { id: 7, title: "Luxury 18” Body Wave Raw Hair", price: 299, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png" },
-        { id: 8, title: "Luxury 6” Water Curly 13x4", price: 120, image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair3.jpg" },
-      ],
+      products: [],
+      loading: true,
+      error: null,
+      search: ""
     };
+  },
+  computed: {
+    filteredProducts() {
+      if (!this.search) return this.products;
+      const q = this.search.toLowerCase().trim();
+      return this.products.filter(p =>
+        (p.name || "").toLowerCase().includes(q) ||
+        (p.description || "").toLowerCase().includes(q)
+      );
+    }
+  },
+  async mounted() {
+    await this.loadProducts();
+  },
+  methods: {
+    async loadProducts() {
+      this.loading = true;
+      try {
+        const res = await axios.get("https://wig-api.onrender.com/api/products");
+        const allProducts = res.data.products || res.data || [];
+
+        // Filter by category slug (wigs)
+        this.products = allProducts.filter(
+          (p) => p.category?.slug === "wigs"
+        );
+      } catch (err) {
+        console.error(err);
+        this.error = "Failed to load products.";
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async addToCart(productId) {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("You need to log in first.");
+
+      try {
+        const res = await axios.post(
+          "https://wig-api.onrender.com/api/cart/add",
+          { productId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Prefer backend success flag/message if available
+        if (res.data?.success || res.status === 200) {
+          alert(res.data?.message || "Added to cart!");
+          // Broadcast an event so Cart page can refresh
+          window.dispatchEvent(new Event("cart-updated"));
+        } else {
+          alert(res.data?.message || "Failed to add to cart.");
+        }
+      } catch (err) {
+        console.error("Add to cart failed:", err);
+        alert("Failed to add to cart.");
+      }
+    },
   },
 };
 </script>
@@ -144,7 +198,6 @@ export default {
   @apply bg-white border border-gray-300 text-black text-sm rounded-md py-2 px-3;
 }
 
-/* Prevent ANY overflow issues */
 * {
   max-width: 100%;
   box-sizing: border-box;

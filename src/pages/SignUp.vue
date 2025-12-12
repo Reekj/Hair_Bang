@@ -115,6 +115,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from '../stores/toast.js';
 
 const router = useRouter();
 const name = ref('');
@@ -144,9 +145,11 @@ async function handleRegister() {
     // Fast parse
     const data = await res.json();
 
-    alert("Account created successfully! Redirecting to login...");
+    toast.show("Registration successful! Redirecting to login...", "success");
 
-    router.push('/login');
+    setTimeout(() => {
+        router.push("/login");
+      }, 2000);
 
   } catch (err) {
     console.error('Registration error:', err);

@@ -41,8 +41,8 @@
             <h3 class="font-medium text-lg">Information</h3>
             <ul class="space-y-6 text-sm opacity-90">
                 <li><a href="#" class="hover:opacity-60">Head Size Guide</a></li>
-                <li><a href="#" class="hover:opacity-60">Contact us</a></li>
-                <li><a href="#" class="hover:opacity-60">Career</a></li>
+                <li><RouterLink to="/contact-us" class="hover:opacity-60">Contact us</RouterLink></li>
+                <li><a class="hover:opacity-60">Career</a></li>
                 <li><a href="#" class="hover:opacity-60">My Account</a></li>
             </ul>
             </div>
@@ -52,11 +52,11 @@
             <h3 class="font-medium text-lg">Customer Services</h3>
             <ul class="space-y-6 text-sm opacity-90">
                 <li><RouterLink to="/shipping">Shipping</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Return & Refund</a></li>
+                <li><RouterLink to="/refund" class="hover:opacity-60">Return & Refund</RouterLink></li>
                 <li><RouterLink to="/privacy">Privacy & Policy</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Terms & Conditions</a></li>
+                <li><RouterLink to="/terms-condition" class="hover:opacity-60">Terms & Conditions</RouterLink></li>
                 <li><a href="#" class="hover:opacity-60">Order FAQs</a></li>
-                <li><a href="#" class="hover:opacity-60">My Wishlist</a></li>
+                <li><RouterLink to="/cart">My Wishlist</RouterLink></li>
             </ul>
             </div>
 

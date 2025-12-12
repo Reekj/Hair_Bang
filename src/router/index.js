@@ -7,6 +7,7 @@ import Accessories from '../pages/Accessories.vue'
 import Jeans from '../pages/Jeans.vue'
 import ProductDetails from '../pages/ProductDetails.vue'
 import Admin from '../pages/Admin.vue'
+import Cart from '../pages/Cart.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -15,12 +16,16 @@ const routes = [
   { path: '/wigs', name: 'Wigs', component: HairCollection },
   { path: '/accessories', name: 'Accessories', component: Accessories },
   { path: '/jeans', name: 'Jeans', component: Jeans },
+  { path: '/cart', name: 'Cart', component: Cart },
   { path: '/shipping', name: 'Shipping', component: () => import('../pages/Shipping.vue') },
   { path: '/privacy', name: 'Privacy', component: () => import('../pages/Privacy.vue') },
+  { path: '/terms-condition', name: 'TermsAndCondition', component: () => import('../pages/TermsAndConditions.vue') },
+  { path: '/refund', name: 'RefundPolicy', component: () => import('../pages/RefundPolicy.vue') },
+  { path:'/contact-us', name: 'ContactUs', component: () => import('../pages/Contact.vue') },
   {
     path: '/product/:id',
     name: 'ProductDetails',
-    component: () => import('../pages/ProductDetails.vue'),
+    component: ProductDetails,
     props: true
   },
   {
@@ -28,8 +33,6 @@ const routes = [
     name: 'Admin',
     component: Admin
   }
-  
-  // add other routes here
 ]
 
 const router = createRouter({

@@ -3,56 +3,58 @@
   
       <!-- HERO SECTION -->
       <section
-  class="w-full bg-[#F6E7DF] border-b pt-[70px] pb-[70px] flex justify-center relative"
->
-  <div class="max-w-[1440px] w-full flex flex-col lg:flex-row items-center justify-between px-6 gap-[59px] relative">
-
-    <!-- LEFT TEXT BLOCK -->
-    <div class="max-w-[597px] space-y-10 order-1 lg:order-1">
-      <h1 class="text-[48px] font-semibold leading-tight text-[#6A2E18] leading-loose">
-        Elevate Your Style with <br /> Premium Fashion
-      </h1>
-
-      <p class="text-[20px] leading-relaxed text-[#5B4A45] ">
-        Discover our curated collection of luxury wigs, sophisticated
-        hair accessories, and premium denim crafted for the modern
-        individual.
-      </p>
-
-      <button
-        class="h-[66px] w-[228px] mt-2 bg-[#B15C32] text-[20px] text-white text-semibold px-[34px] py-[17px] rounded-xl font-medium hover:bg-[#582614] transition"
+        class="w-full bg-cover border-b pt-[70px] pb-[70px] flex justify-center relative"
+        style="background-image: url('https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairgroup3.jpg');"
       >
-        Shop Collection
-      </button>
+        <div class="absolute inset-0 bg-black/50"></div>
+        <div class="max-w-[1440px] w-full flex flex-col lg:flex-row items-center justify-between px-6 gap-[59px] relative">
+
+          <!-- LEFT TEXT BLOCK -->
+          <div class="max-w-[597px] space-y-10 order-1 lg:order-1">
+            <h1 class="text-[48px] font-semibold leading-tight text-white leading-loose">
+              Elevate Your Style with <br /> Premium Fashion
+            </h1>
+
+            <p class="text-[20px] leading-relaxed text-white ">
+              Discover our curated collection of luxury wigs, sophisticated
+              hair accessories, and premium denim crafted for the modern
+              individual.
+            </p>
+
+            <button
+              class="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] h-[66px] w-[228px] mt-2 bg-[#B15C32] text-[20px] text-white text-semibold px-[34px] py-[17px] rounded-xl font-medium hover:bg-[#582614] transition"
+            >
+              Shop Collection
+            </button>
+          </div>
+
+          <!-- RIGHT: CAROUSEL -->
+          <div class="w-full max-w-[602px] sm:max-w-[500px] md:max-w-[550px] lg:max-w-[602px] aspect-[1/1] overflow-hidden relative border border-gray-300 rounded-md mt-8 lg:mt-0 order-0 lg:order-2">
+            
+            <div class="flex transition-transform duration-700" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
+              <div v-for="(img, index) in images" :key="index" class="flex-shrink-0 w-full h-full">
+                <LazyImage
+                  :src="img"
+                  alt="Hero Wig"
+                  class="w-full h-full object-cover rounded-md"
+                />
+              </div>
+            </div>
+
+            <!-- DOTS -->
+            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+              <span
+                v-for="(img, i) in images"
+                :key="i"
+                @click="currentIndex = i"
+                class="w-3 h-3 rounded-full cursor-pointer transition"
+                :class="currentIndex === i ? 'bg-[#B15C32]' : 'bg-white/60'"
+              ></span>
+            </div>
+          </div>
+
     </div>
-
-    <!-- RIGHT: CAROUSEL -->
-    <div class="w-full max-w-[602px] sm:max-w-[500px] md:max-w-[550px] lg:max-w-[602px] aspect-[1/1] overflow-hidden relative border border-gray-300 rounded-md mt-8 lg:mt-0 order-0 lg:order-2">
-      
-      <div class="flex transition-transform duration-700" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-        <div v-for="(img, index) in images" :key="index" class="flex-shrink-0 w-full h-full">
-          <LazyImage
-            :src="img"
-            alt="Hero Wig"
-            class="w-full h-full object-cover rounded-md"
-          />
-        </div>
-      </div>
-
-      <!-- DOTS -->
-      <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-        <span
-          v-for="(img, i) in images"
-          :key="i"
-          @click="currentIndex = i"
-          class="w-3 h-3 rounded-full cursor-pointer transition"
-          :class="currentIndex === i ? 'bg-[#B15C32]' : 'bg-white/60'"
-        ></span>
-      </div>
-    </div>
-
-  </div>
-</section>
+      </section>
 
 
   
@@ -286,10 +288,10 @@
 import { ref, onMounted } from 'vue'
 
 const images = [
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/heroimg.jpg",
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/dummywig1.jpeg",
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/dummywig2.jpeg",
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/dummywig3.jpeg"
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage10.jpg",
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage11.webp",
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage15.jpg",
+  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage16.jpg"
 ]
 
 const currentIndex = ref(0)

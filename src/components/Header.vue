@@ -225,6 +225,7 @@ import { ref, computed } from "vue";
 import { useRouter, RouterLink } from "vue-router";
 import { onMounted, onBeforeUnmount } from "vue"
 import { useAuth } from "../stores/auth.js"
+import { toast } from "../stores/toast.js";
 
 const { user, isLoggedIn, logout, restoreFromLocalStorage } = useAuth()
 
@@ -243,7 +244,10 @@ const toggleDropdown = () => {
 const handleLogout = () => {
   logout()
   showDropdown.value = false
-  window.location.href = "/"
+  toast.show("Logged out successfully", "success");
+  setTimeout(() => {
+        router.push("/");
+      }, 1000);
 }
 
 // Close dropdown when clicking outside
