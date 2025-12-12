@@ -1,9 +1,10 @@
 <template>
   <div class="w-full bg-[#F7EDE5] pb-20 min-h-screen">
-
     <!-- Header -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold text-center">
+      <h1
+        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold text-center"
+      >
         Your Cart
       </h1>
     </section>
@@ -20,11 +21,16 @@
       >
         <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 mb-4">
-          <img :src="item.product.image" class="w-full h-full object-cover rounded-xl" />
+          <img
+            :src="item.product.image"
+            class="w-full h-full object-cover rounded-xl"
+          />
         </div>
 
         <!-- Name -->
-        <h3 class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4">
+        <h3
+          class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4"
+        >
           {{ item.product.name }}
         </h3>
 
@@ -38,21 +44,25 @@
           <button
             @click="updateQuantity(item.product._id, item.quantity - 1)"
             class="px-3 py-1 bg-gray-300 rounded-md text-[#6A2E18] font-semibold"
-          >-</button>
+          >
+            -
+          </button>
 
           <span>{{ item.quantity }}</span>
 
           <button
             @click="updateQuantity(item.product._id, item.quantity + 1)"
             class="px-3 py-1 bg-gray-300 rounded-md text-[#6A2E18] font-semibold"
-          >+</button>
+          >
+            +
+          </button>
         </div>
 
         <!-- Remove Button -->
         <button
           @click="removeFromCart(item.product._id)"
           class="mt-auto mx-4 mb-4 rounded-xl text-white text-sm sm:text-base font-medium h-10 sm:h-12 w-auto"
-          style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
+          style="background: linear-gradient(90deg, #b13f32 0%, #4b1b15 100%)"
         >
           Remove
         </button>
@@ -76,12 +86,11 @@
       <button
         @click="checkout"
         class="px-6 py-3 rounded-xl text-white font-medium"
-        style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
+        style="background: linear-gradient(90deg, #b13f32 0%, #4b1b15 100%)"
       >
         Checkout
       </button>
     </div>
-
   </div>
 </template>
 
@@ -103,7 +112,7 @@ export default {
 
       try {
         const res = await axios.get("https://wig-api.onrender.com/api/cart", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         console.log("RAW CART RESPONSE:", res.data);
@@ -117,13 +126,12 @@ export default {
 
         // Filter out invalid/null product entries
         cartItems.value = raw
-          .filter(item => item && item.productId && item.productId._id)
-          .map(item => ({
+          .filter((item) => item && item.productId && item.productId._id)
+          .map((item) => ({
             _id: item._id,
             quantity: item.quantity ?? 1,
-            product: item.productId
+            product: item.productId,
           }));
-
       } catch (err) {
         console.error("Failed to fetch cart:", err);
       }
@@ -142,7 +150,7 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        const item = cartItems.value.find(i => i.product._id === productId);
+        const item = cartItems.value.find((i) => i.product._id === productId);
         if (item) item.quantity = newQuantity;
       } catch (err) {
         console.error("Failed to update quantity:", err);
@@ -160,7 +168,9 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        cartItems.value = cartItems.value.filter(i => i.product._id !== productId);
+        cartItems.value = cartItems.value.filter(
+          (i) => i.product._id !== productId
+        );
       } catch (err) {
         console.error("Failed to remove item:", err);
         alert("Could not remove item.");
@@ -180,10 +190,52 @@ export default {
     /** ----------------------------
      * CHECKOUT
      ----------------------------- */
+    /** ----------------------------
+ * CHECKOUT (Paystack Init)
+ ----------------------------- */
     const checkout = () => {
-      if (!cartItems.value.length) return alert("Your cart is empty.");
-      alert(`Proceed to checkout — Total: ₦${totalPrice.value.toLocaleString()}`);
+      if (!cartItems.value.length) return alert("Cart empty");
+
+      const handler = PaystackPop.setup({
+        key: "pk_test_77963b9442b15cc08d342806983cf5067092ad28",
+        email: "oekisola589@gmail.com",
+        amount: totalPrice.value * 100,
+        metadata: {
+          cart: cartItems.value.map((item) => ({
+            productId: item.product._id,
+            quantity: item.quantity,
+          })),
+        },
+        callback: function (response) {
+          handlePaymentSuccess(response);
+        },
+        onClose: function () {
+          alert("Payment closed");
+        },
+      });
+
+      handler.openIframe();
     };
+
+    async function handlePaymentSuccess(response) {
+      try {
+        const res = await axios.get(
+          `https://wig-api.onrender.com/api/paystack/verify/${response.reference}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        alert("Payment successful!");
+        cartItems.value = [];
+        window.location.href = "/cart";
+      } catch (err) {
+        console.error(err);
+        alert("Payment verified, but could not update cart");
+      }
+    }
 
     /** ----------------------------
      * LISTEN FOR CART UPDATES
@@ -201,7 +253,7 @@ export default {
       updateQuantity,
       removeFromCart,
       totalPrice,
-      checkout
+      checkout,
     };
   },
 };
