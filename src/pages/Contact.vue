@@ -71,6 +71,7 @@
 
 <script setup>
 import { reactive } from "vue";
+import { toast } from "../stores/toast.js";
 
 const form = reactive({
   name: "",
@@ -80,6 +81,6 @@ const form = reactive({
 
 const submitForm = () => {
   console.log("Form submitted:", form);
-  alert("Message sent!");
+  toast.show("Your message has been sent successfully!", "success");
 };
 </script>
