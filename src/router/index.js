@@ -22,6 +22,7 @@ const routes = [
   { path: '/terms-condition', name: 'TermsAndCondition', component: () => import('../pages/TermsAndConditions.vue') },
   { path: '/refund', name: 'RefundPolicy', component: () => import('../pages/RefundPolicy.vue') },
   { path:'/contact-us', name: 'ContactUs', component: () => import('../pages/Contact.vue') },
+  { path:'/FAQ', name: 'FAQ', component: () => import('../pages/FAQ.vue') },
   {
     path: '/product/:id',
     name: 'ProductDetails',
