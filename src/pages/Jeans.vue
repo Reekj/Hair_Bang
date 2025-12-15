@@ -1,19 +1,26 @@
 <template>
   <div class="w-full bg-[#F7EDE5] pb-20 overflow-x-hidden">
-
     <!-- Header Section -->
     <section>
       <div
         class="relative w-full h-[430px] sm:h-[500px] md:h-[550px] lg:h-[600px] bg-cover bg-center mb-10"
-        style="background-image: url('https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/jeans_header.jpg')"
+        style="
+          background-image: url('https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/jeans_header.jpg');
+        "
       >
         <div class="absolute inset-0 bg-[rgba(255,255,255,0.6)]"></div>
 
-        <div class="relative z-10 flex items-center justify-center h-full flex-col text-center px-4">
-          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold leading-snug">
+        <div
+          class="relative z-10 flex items-center justify-center h-full flex-col text-center px-4"
+        >
+          <h1
+            class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold leading-snug"
+          >
             Premium Jeans Collection
           </h1>
-          <p class="text-[16px] sm:text-[18px] md:text-[20px] text-[#6A2E18] mt-2 opacity-90">
+          <p
+            class="text-[16px] sm:text-[18px] md:text-[20px] text-[#6A2E18] mt-2 opacity-90"
+          >
             Stylish, long-lasting & built for comfort.
           </p>
         </div>
@@ -25,22 +32,14 @@
       class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-10"
     >
       <div class="flex flex-wrap gap-3 sm:gap-6 items-center">
-        <p class="text-[#6A2E18]">Sort by:</p>
-
-        <select class="filter-select w-full sm:w-[160px] h-[43px]">
-          <option>Popular</option>
-        </select>
-
-        <select class="filter-select w-full sm:w-[160px] h-[43px]">
-          <option>Color</option>
-        </select>
-
-        <select class="filter-select w-full sm:w-[160px] h-[43px]">
-          <option>Material</option>
-        </select>
-
-        <select class="filter-select w-full sm:w-[160px] h-[43px]">
-          <option>Size</option>
+        <select
+          class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md"
+          v-model="sortBy"
+        >
+          <option value="popular">Popular</option>
+          <option value="priceLow">Price: Low to High</option>
+          <option value="priceHigh">Price: High to Low</option>
+          <option value="latest">Latest</option>
         </select>
       </div>
 
@@ -52,7 +51,9 @@
           class="w-full bg-white border border-gray-300 rounded-md py-2 pl-3 pr-10 text-sm"
           v-model="search"
         />
-        <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-60">🔍</span>
+        <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-60"
+          >🔍</span
+        >
       </div>
     </section>
 
@@ -68,7 +69,7 @@
         <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 mb-4">
           <img
-            :src="item.image"
+            :src="item.images?.[0] || ''"
             class="w-full h-full object-cover rounded-xl"
             :alt="item.name"
           />
@@ -79,9 +80,11 @@
             class="absolute top-3 right-3 bg-white p-2 rounded-full shadow"
           >
             <img
-              :src="favorites.includes(item._id) 
-                ? 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-heart-filled.svg'
-                : 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png'"
+              :src="
+                favorites.includes(item._id)
+                  ? 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-heart-filled.svg'
+                  : 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png'
+              "
               alt="like"
               class="w-[18px] h-[18px]"
             />
@@ -89,13 +92,15 @@
         </div>
 
         <!-- Title -->
-        <h3 class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4">
+        <h3
+          class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4"
+        >
           {{ item.name }}
         </h3>
 
         <!-- Small Description -->
         <p class="text-[#6A2E18] text-sm sm:text-[14px] mt-1 px-4">
-          {{ item.description || 'Premium high-quality denim' }}
+          {{ item.description || "Premium high-quality denim" }}
         </p>
 
         <!-- Price -->
@@ -115,18 +120,22 @@
         <button
           @click="addToCart(item._id)"
           class="mt-auto mx-4 mb-4 rounded-xl text-white text-sm sm:text-base font-medium h-10 sm:h-12 w-auto"
-          style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
+          style="background: linear-gradient(90deg, #b13f32 0%, #4b1b15 100%)"
         >
           Add to Cart
         </button>
       </div>
 
-      <div v-if="loading" class="col-span-full text-center text-gray-700">Loading products...</div>
-      <div v-if="!loading && filteredProducts.length === 0" class="col-span-full text-center text-gray-500">
+      <div v-if="loading" class="col-span-full text-center text-gray-700">
+        Loading products...
+      </div>
+      <div
+        v-if="!loading && filteredProducts.length === 0"
+        class="col-span-full text-center text-gray-500"
+      >
         No jeans available.
       </div>
     </section>
-
   </div>
 </template>
 
@@ -142,18 +151,38 @@ export default {
       favorites: [],
       loading: true,
       error: null,
-      search: ""
+      search: "",
+      sortBy: "popular", // default
     };
   },
   computed: {
     filteredProducts() {
-      if (!this.search) return this.products;
-      const q = this.search.toLowerCase().trim();
-      return this.products.filter(p =>
-        (p.name || "").toLowerCase().includes(q) ||
-        (p.description || "").toLowerCase().includes(q)
-      );
-    }
+      let filtered = this.products;
+
+      // Search filter
+      if (this.search) {
+        const q = this.search.toLowerCase().trim();
+        filtered = filtered.filter(
+          (p) =>
+            (p.name || "").toLowerCase().includes(q) ||
+            (p.description || "").toLowerCase().includes(q)
+        );
+      }
+
+      // Sorting
+      if (this.sortBy === "priceLow") {
+        filtered = filtered.slice().sort((a, b) => a.price - b.price);
+      } else if (this.sortBy === "priceHigh") {
+        filtered = filtered.slice().sort((a, b) => b.price - a.price);
+      } else if (this.sortBy === "latest") {
+        // Assuming your API provides a `createdAt` field
+        filtered = filtered
+          .slice()
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      }
+
+      return filtered;
+    },
   },
   async mounted() {
     await this.loadProducts();
@@ -167,13 +196,13 @@ export default {
     async loadProducts() {
       this.loading = true;
       try {
-        const res = await axios.get("https://wig-api.onrender.com/api/products");
+        const res = await axios.get(
+          "https://wig-api.onrender.com/api/products"
+        );
         const allProducts = res.data.products || res.data || [];
 
         // Filter by category slug (jeans)
-        this.products = allProducts.filter(
-          (p) => p.category?.slug === "jeans"
-        );
+        this.products = allProducts.filter((p) => p.category?.slug === "jeans");
       } catch (err) {
         console.error(err);
         this.error = "Failed to load products.";
@@ -184,7 +213,8 @@ export default {
 
     async addToCart(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return toast.show("Please log in to add items to cart.", "error");
+      if (!token)
+        return toast.show("Please log in to add items to cart.", "error");
 
       try {
         const res = await axios.post(
@@ -220,9 +250,8 @@ export default {
 
         // ✅ map to product IDs for heart logic
         this.favorites = (res.data || [])
-          .map(f => f.productId?._id)
+          .map((f) => f.productId?._id)
           .filter(Boolean);
-
       } catch (err) {
         console.error("Failed to load favorites:", err);
       }
@@ -247,7 +276,7 @@ export default {
             `https://wig-api.onrender.com/api/favorites/remove/${productId}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
-          this.favorites = this.favorites.filter(id => id !== productId);
+          this.favorites = this.favorites.filter((id) => id !== productId);
         }
 
         // ✅ notify Favorites page
@@ -256,8 +285,8 @@ export default {
         console.error("Failed to update favorite:", err);
         alert("Could not update favorite.");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
