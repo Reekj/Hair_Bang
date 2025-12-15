@@ -97,6 +97,7 @@
 <script>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
+import { toast } from "../stores/toast.js";
 
 export default {
   name: "Cart",
@@ -154,7 +155,7 @@ export default {
         if (item) item.quantity = newQuantity;
       } catch (err) {
         console.error("Failed to update quantity:", err);
-        alert("Could not update quantity.");
+        toast.show("Could not update item quantity.", "error");
       }
     };
 
@@ -173,7 +174,7 @@ export default {
         );
       } catch (err) {
         console.error("Failed to remove item:", err);
-        alert("Could not remove item.");
+        toast.show("Could not remove item from cart.", "error");
       }
     };
 
@@ -210,7 +211,7 @@ export default {
           handlePaymentSuccess(response);
         },
         onClose: function () {
-          alert("Payment closed");
+          toast.show("Payment cancelled.", "info");
         },
       });
 
@@ -228,12 +229,12 @@ export default {
           }
         );
 
-        alert("Payment successful!");
+        toast.show("Payment successful! Thank you for your purchase.", "success");
         cartItems.value = [];
         window.location.href = "/cart";
       } catch (err) {
         console.error(err);
-        alert("Payment verified, but could not update cart");
+        toast.show("Payment verification failed. Please contact support.", "error");
       }
     }
 
