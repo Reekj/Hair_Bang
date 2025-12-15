@@ -60,7 +60,7 @@
                 <li><RouterLink to="/refund" class="hover:opacity-60">Return & Refund</RouterLink></li>
                 <li><RouterLink to="/privacy">Privacy & Policy</RouterLink></li>
                 <li><RouterLink to="/terms-condition" class="hover:opacity-60">Terms & Conditions</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Order FAQs</a></li>
+                <li><RouterLink to="/FAQ" class="hover:opacity-60">Order FAQs</RouterLink></li>
                 <li><RouterLink to="/favorites" class="hover:opacity-60">My Wishlist</RouterLink></li>
             </ul>
             </div>
