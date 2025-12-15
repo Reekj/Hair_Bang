@@ -36,7 +36,7 @@
 
         <!-- Price -->
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
-          ₦{{ (item.product.price * item.quantity).toLocaleString() }}
+          ₦{{ item.product.price.toLocaleString() }}
         </p>
 
         <!-- Quantity Controls -->
@@ -259,10 +259,10 @@ export default {
   },
 };
 </script>
+  
 
 <style scoped>
 * {
   box-sizing: border-box;
 }
 </style>
-``

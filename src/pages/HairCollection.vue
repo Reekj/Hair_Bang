@@ -8,7 +8,6 @@
         style="background-image: url('https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/hairaccecories1.png')"
       >
         <div class="absolute inset-0 bg-[rgba(255,255,255,0.6)]"></div>
-
         <div class="relative z-10 flex items-center justify-center h-full flex-col text-center px-4">
           <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold leading-snug">
             Premium Hair Collection
@@ -26,19 +25,15 @@
     >
       <div class="flex flex-wrap gap-3 sm:gap-6 items-center">
         <p class="text-[#6A2E18]">Sort by:</p>
-
         <select class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md">
           <option class="text-[#6A2E18CC]">Popular</option>
         </select>
-
         <select class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md">
           <option class="text-[#6A2E18CC]">Length</option>
         </select>
-
         <select class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md">
           <option class="text-[#6A2E18CC]">Color</option>
         </select>
-
         <select class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md">
           <option class="text-[#6A2E18CC]">Texture</option>
         </select>
@@ -75,9 +70,15 @@
             :alt="item.name"
           />
 
-          <button class="absolute top-3 right-3 bg-none p-2 rounded-full">
+          <!-- Favorites Heart -->
+          <button
+            class="absolute top-3 right-3 bg-none p-2 rounded-full"
+            @click="toggleFavorite(item._id)"
+          >
             <img 
-              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
+              :src="favorites.includes(item._id) 
+                     ? 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-heart-filled.svg'
+                     : 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png'"
               class="w-6 h-6"
             />
           </button>
@@ -116,7 +117,6 @@
         No wigs available.
       </div>
     </section>
-
   </div>
 </template>
 
@@ -125,50 +125,112 @@ import axios from "axios";
 import { toast } from "../stores/toast.js";
 
 export default {
-  name: "WigsPage",
+  name: "HairCollection",
   data() {
     return {
       products: [],
+      favorites: [], // fetch from backend
       loading: true,
       error: null,
       search: ""
     };
   },
+  async mounted() {
+    await this.loadProducts();
+    await this.loadFavorites();
+    window.addEventListener("favorites-updated", this.loadFavorites);
+  },
+  beforeUnmount() {
+    window.removeEventListener("favorites-updated", this.loadFavorites);
+  },
   computed: {
     filteredProducts() {
       if (!this.search) return this.products;
       const q = this.search.toLowerCase().trim();
-      return this.products.filter(p =>
-        (p.name || "").toLowerCase().includes(q) ||
-        (p.description || "").toLowerCase().includes(q)
+      return this.products.filter(
+        (p) =>
+          (p.name || "").toLowerCase().includes(q) ||
+          (p.description || "").toLowerCase().includes(q)
       );
     }
-  },
-  async mounted() {
-    await this.loadProducts();
   },
   methods: {
     async loadProducts() {
       this.loading = true;
+      this.error = null;
       try {
         const res = await axios.get("https://wig-api.onrender.com/api/products");
         const allProducts = res.data.products || res.data || [];
 
         // Filter by category slug (wigs)
-        this.products = allProducts.filter(
-          (p) => p.category?.slug === "wigs"
-        );
+        this.products = allProducts.filter((p) => p.category?.slug === "wigs");
       } catch (err) {
-        console.error(err);
+        console.error("Failed to load products:", err);
         this.error = "Failed to load products.";
       } finally {
         this.loading = false;
       }
     },
 
+    async loadFavorites() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get(
+          "https://wig-api.onrender.com/api/favorites",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // Normalize favorites as array of product IDs
+        this.favorites = res.data.map(f => typeof f.productId === 'object' ? f.productId._id : f.productId);
+      } catch (err) {
+        console.error("Failed to load favorites:", err);
+      }
+    },
+
+    async toggleFavorite(productId) {
+      const token = localStorage.getItem("token");
+      if (!token) return toast.show("Please log in to favorite items.", "error");
+
+      const isFav = this.favorites.includes(productId);
+
+      try {
+        if (!isFav) {
+          // Add to favorites
+          const res = await axios.post(
+            "https://wig-api.onrender.com/api/favorites/add",
+            { productId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (res.data?.success || res.status === 200) {
+            this.favorites.push(productId);
+            window.dispatchEvent(new Event("favorites-updated"));
+          }
+        } else {
+          // Remove from favorites
+          const res = await axios.delete(
+            `https://wig-api.onrender.com/api/favorites/remove/${productId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (res.status === 200) {
+            this.favorites = this.favorites.filter(id => id !== productId);
+            window.dispatchEvent(new Event("favorites-updated"));
+          }
+        }
+      } catch (err) {
+        console.error("Favorites update failed:", err);
+        toast.show("Failed to update favorites.", "error");
+      }
+    },
+
     async addToCart(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return toast.show("Please log in to add items to cart.", "error");
+      if (!token) {
+        toast.show("Please log in to add items to cart.", "error");
+        return;
+      }
 
       try {
         const res = await axios.post(
@@ -177,10 +239,8 @@ export default {
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
-        // Prefer backend success flag/message if available
         if (res.data?.success || res.status === 200) {
           toast.show("Product added to cart!", "success");
-          // Broadcast an event so Cart page can refresh
           window.dispatchEvent(new Event("cart-updated"));
         } else {
           toast.show("Failed to add product to cart.", "error");
@@ -189,8 +249,8 @@ export default {
         console.error("Add to cart failed:", err);
         toast.show("Error adding product to cart.", "error");
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -204,3 +264,4 @@ export default {
   box-sizing: border-box;
 }
 </style>
+``

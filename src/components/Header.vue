@@ -94,7 +94,7 @@
           </div>
         </div>
 
-        <RouterLink to="/signup">
+        <RouterLink to="/favorites">
           <img
             src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
             class="w-5 h-5"

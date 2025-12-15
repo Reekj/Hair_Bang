@@ -13,9 +13,9 @@
           <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold leading-snug">
             Premium Jeans Collection
           </h1>
-            <p class="text-[16px] sm:text-[18px] md:text-[20px] text-[#6A2E18] mt-2 opacity-90">
-              Stylish, long-lasting & built for comfort.
-            </p>
+          <p class="text-[16px] sm:text-[18px] md:text-[20px] text-[#6A2E18] mt-2 opacity-90">
+            Stylish, long-lasting & built for comfort.
+          </p>
         </div>
       </div>
     </section>
@@ -74,9 +74,14 @@
           />
 
           <!-- Heart Icon -->
-          <button class="absolute top-3 right-3 bg-white p-2 rounded-full shadow">
+          <button
+            @click="toggleFavorite(item._id)"
+            class="absolute top-3 right-3 bg-white p-2 rounded-full shadow"
+          >
             <img
-              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
+              :src="favorites.includes(item._id) 
+                ? 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-heart-filled.svg'
+                : 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png'"
               alt="like"
               class="w-[18px] h-[18px]"
             />
@@ -97,6 +102,14 @@
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
           ${{ item.price }}
         </p>
+
+        <!-- View Details Link -->
+        <router-link
+          :to="`/product/${item._id}`"
+          class="text-[#6A2E18] underline text-sm sm:text-base mt-1 px-4"
+        >
+          View Details
+        </router-link>
 
         <!-- Add to Cart -->
         <button
@@ -126,6 +139,7 @@ export default {
   data() {
     return {
       products: [],
+      favorites: [],
       loading: true,
       error: null,
       search: ""
@@ -143,6 +157,11 @@ export default {
   },
   async mounted() {
     await this.loadProducts();
+    await this.loadFavorites();
+    window.addEventListener("favorites-updated", this.loadFavorites);
+  },
+  beforeUnmount() {
+    window.removeEventListener("favorites-updated", this.loadFavorites);
   },
   methods: {
     async loadProducts() {
@@ -185,7 +204,60 @@ export default {
         toast.show("Error adding product to cart.", "error");
       }
     },
-  },
+
+    /** ----------------------------
+     * FAVORITES FUNCTIONALITY
+     ----------------------------- */
+    async loadFavorites() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get(
+          "https://wig-api.onrender.com/api/favorites",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // ✅ map to product IDs for heart logic
+        this.favorites = (res.data || [])
+          .map(f => f.productId?._id)
+          .filter(Boolean);
+
+      } catch (err) {
+        console.error("Failed to load favorites:", err);
+      }
+    },
+
+    async toggleFavorite(productId) {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("You need to log in first.");
+
+      const isFav = this.favorites.includes(productId);
+
+      try {
+        if (!isFav) {
+          await axios.post(
+            "https://wig-api.onrender.com/api/favorites/add",
+            { productId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          this.favorites.push(productId);
+        } else {
+          await axios.delete(
+            `https://wig-api.onrender.com/api/favorites/remove/${productId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          this.favorites = this.favorites.filter(id => id !== productId);
+        }
+
+        // ✅ notify Favorites page
+        window.dispatchEvent(new Event("favorites-updated"));
+      } catch (err) {
+        console.error("Failed to update favorite:", err);
+        alert("Could not update favorite.");
+      }
+    }
+  }
 };
 </script>
 

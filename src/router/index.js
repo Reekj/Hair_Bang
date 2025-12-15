@@ -8,6 +8,9 @@ import Jeans from '../pages/Jeans.vue'
 import ProductDetails from '../pages/ProductDetails.vue'
 import Admin from '../pages/Admin.vue'
 import Cart from '../pages/Cart.vue'
+import HeadSizeGuide from '../pages/HeadSizeGuide.vue'
+import Favorites from '../pages/Favorites.vue'
+import Directions from '../pages/Directions.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -17,12 +20,16 @@ const routes = [
   { path: '/accessories', name: 'Accessories', component: Accessories },
   { path: '/jeans', name: 'Jeans', component: Jeans },
   { path: '/cart', name: 'Cart', component: Cart },
+  { path: '/headsizeguide', name: 'headsizeguide', component: HeadSizeGuide },
   { path: '/shipping', name: 'Shipping', component: () => import('../pages/Shipping.vue') },
   { path: '/privacy', name: 'Privacy', component: () => import('../pages/Privacy.vue') },
   { path: '/terms-condition', name: 'TermsAndCondition', component: () => import('../pages/TermsAndConditions.vue') },
   { path: '/refund', name: 'RefundPolicy', component: () => import('../pages/RefundPolicy.vue') },
   { path:'/contact-us', name: 'ContactUs', component: () => import('../pages/Contact.vue') },
   { path:'/FAQ', name: 'FAQ', component: () => import('../pages/FAQ.vue') },
+  { path:'/favorites', name: 'favorites', component: Favorites },
+  { path:'/directions', name: 'directions', component: Directions },
+
   {
     path: '/product/:id',
     name: 'ProductDetails',

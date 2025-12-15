@@ -16,7 +16,12 @@
 
             <!-- Contact Lines -->
             <div class="text-sm space-y-6">
-                <p class="font-semibold">GET DIRECTION</p>
+                <RouterLink
+                    to="/directions"
+                    class="text-sm space-y-6 cursor-pointer hover:opacity-80 transition"
+                    >
+                    <p class="font-semibold">GET DIRECTION</p>
+                </RouterLink>
                 <p class="flex items-center gap-2">
                 <span class="text-sm"><img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/messageicon.png" alt=""></span> shop@herhairbang.com
                 </p>
@@ -24,13 +29,13 @@
 
             <!-- Social Icons -->
             <div class="flex items-center gap-6 text-xl">
-                <a href="#" class="hover:opacity-60">
+                <a href="https://www.facebook.com/share/1WB6e7TJTV/?mibextid=wwXIfr" class="hover:opacity-60">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/fblogo.png" alt="">
                 </a>
-                <a href="#" class="hover:opacity-60">
+                <a href="https://www.instagram.com/herhairbang?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="hover:opacity-60">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/ig_icon.png" alt="">
                 </a>
-                <a href="#" class="hover:opacity-60">
+                <a href="https://www.tiktok.com/@herhairbang.uk?_r=1&_t=ZS-92EnNRmKBZl" class="hover:opacity-60">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/tiktoklogo.png" alt="">
                 </a>
             </div>
@@ -40,10 +45,10 @@
             <div class="space-y-3">
             <h3 class="font-medium text-lg">Information</h3>
             <ul class="space-y-6 text-sm opacity-90">
-                <li><a href="#" class="hover:opacity-60">Head Size Guide</a></li>
+                <li><RouterLink to="/headsizeguide" class="hover:opacity-60">Head Size Guide</RouterLink></li>
                 <li><RouterLink to="/contact-us" class="hover:opacity-60">Contact us</RouterLink></li>
-                <li><a class="hover:opacity-60">Career</a></li>
-                <li><a href="#" class="hover:opacity-60">My Account</a></li>
+                <!-- <li><a href="" class="hover:opacity-60">Career</a></li> -->
+                <!-- <li><a href="#" class="hover:opacity-60">My Account</a></li> -->
             </ul>
             </div>
 
@@ -55,8 +60,8 @@
                 <li><RouterLink to="/refund" class="hover:opacity-60">Return & Refund</RouterLink></li>
                 <li><RouterLink to="/privacy">Privacy & Policy</RouterLink></li>
                 <li><RouterLink to="/terms-condition" class="hover:opacity-60">Terms & Conditions</RouterLink></li>
-                <li><RouuterLink to="/FAQ" class="hover:opacity-60">Order FAQs</RouuterLink></li>
-                <li><RouterLink to="/cart">My Wishlist</RouterLink></li>
+                <li><a href="#" class="hover:opacity-60">Order FAQs</a></li>
+                <li><RouterLink to="/favorites" class="hover:opacity-60">My Wishlist</RouterLink></li>
             </ul>
             </div>
 
@@ -75,7 +80,7 @@
                     placeholder="Email Address.." 
                     class="w-full bg-white text-black rounded-full p-[12px] text-sm focus:outline-none h-[48px] w-[296px]"
                     />
-                    <button class="absolute top-1/2 -translate-y-1/2 right-0 opacity-70 hover:opacity-100">
+                    <button class="absolute top-1/2 -translate-y-1/2 right-0 mr-[20px] opacity-70 hover:opacity-100">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mynaui_send.png" alt="">
                     </button>
                 </div>
