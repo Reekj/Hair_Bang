@@ -1,9 +1,10 @@
 <template>
   <div class="w-full bg-[#F7EDE5] pb-20 min-h-screen">
-
     <!-- Header -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold text-center">
+      <h1
+        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-[#6A2E18] font-semibold text-center"
+      >
         Your Cart
       </h1>
     </section>
@@ -20,11 +21,16 @@
       >
         <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 mb-4">
-          <img :src="item.product.image" class="w-full h-full object-cover rounded-xl" />
+          <img
+            :src="item.product.image"
+            class="w-full h-full object-cover rounded-xl"
+          />
         </div>
 
         <!-- Name -->
-        <h3 class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4">
+        <h3
+          class="text-[#6A2E18] font-medium text-base sm:text-[17px] md:text-lg leading-snug px-4"
+        >
           {{ item.product.name }}
         </h3>
 
@@ -38,21 +44,25 @@
           <button
             @click="updateQuantity(item.product._id, item.quantity - 1)"
             class="px-3 py-1 bg-gray-300 rounded-md text-[#6A2E18] font-semibold"
-          >-</button>
+          >
+            -
+          </button>
 
           <span>{{ item.quantity }}</span>
 
           <button
             @click="updateQuantity(item.product._id, item.quantity + 1)"
             class="px-3 py-1 bg-gray-300 rounded-md text-[#6A2E18] font-semibold"
-          >+</button>
+          >
+            +
+          </button>
         </div>
 
         <!-- Remove Button -->
         <button
           @click="removeFromCart(item.product._id)"
           class="mt-auto mx-4 mb-4 rounded-xl text-white text-sm sm:text-base font-medium h-10 sm:h-12 w-auto"
-          style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
+          style="background: linear-gradient(90deg, #b13f32 0%, #4b1b15 100%)"
         >
           Remove
         </button>
@@ -76,139 +86,188 @@
       <button
         @click="checkout"
         class="px-6 py-3 rounded-xl text-white font-medium"
-        style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
+        style="background: linear-gradient(90deg, #b13f32 0%, #4b1b15 100%)"
       >
         Checkout
       </button>
     </div>
-
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import axios from "axios";
-
-export default {
-  name: "Cart",
-  setup() {
-    const cartItems = ref([]);
-    const token = localStorage.getItem("token");
-
-    /** ----------------------------
-     * FETCH CART (safe parsing)
-     ----------------------------- */
-    const fetchCart = async () => {
-      if (!token) return;
-
-      try {
-        const res = await axios.get("https://wig-api.onrender.com/api/cart", {
-          headers: { Authorization: `Bearer ${token}` }
+  import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+  import axios from "axios";
+  
+  export default {
+    name: "Cart",
+    setup() {
+      const cartItems = ref([]);
+      const token = localStorage.getItem("token");
+  
+      /** ----------------------------
+       * FETCH CART (safe parsing)
+       ----------------------------- */
+      const fetchCart = async () => {
+        if (!token) return;
+  
+        try {
+          const res = await axios.get("https://wig-api.onrender.com/api/cart", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+  
+          console.log("RAW CART RESPONSE:", res.data);
+  
+          let raw = [];
+          if (Array.isArray(res.data)) raw = res.data;
+          else if (Array.isArray(res.data.cart)) raw = res.data.cart;
+          else if (Array.isArray(res.data.items)) raw = res.data.items;
+          else if (Array.isArray(res.data.cartItems)) raw = res.data.cartItems;
+  
+          cartItems.value = raw
+            .filter((item) => item && item.productId && item.productId._id)
+            .map((item) => ({
+              _id: item._id,
+              quantity: item.quantity ?? 1,
+              product: item.productId,
+            }));
+        } catch (err) {
+          console.error("Failed to fetch cart:", err);
+        }
+      };
+  
+      /** ----------------------------
+       * UPDATE QUANTITY
+       * - Instantly updates UI
+       * - Sends request to backend
+       ----------------------------- */
+      const updateQuantity = async (productId, newQuantity) => {
+        if (newQuantity < 1) return;
+  
+        const item = cartItems.value.find((i) => i.product._id === productId);
+        if (!item) return;
+  
+        // Instant UI update
+        item.quantity = newQuantity;
+  
+        try {
+          await axios.put(
+            "https://wig-api.onrender.com/api/cart/update",
+            { productId, quantity: newQuantity },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (err) {
+          console.error("Failed to update quantity:", err);
+          alert("Could not update quantity.");
+        }
+      };
+  
+      /** ----------------------------
+       * REMOVE ITEM
+       ----------------------------- */
+      const removeFromCart = async (productId) => {
+        try {
+          await axios.delete(
+            `https://wig-api.onrender.com/api/cart/remove/${productId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+  
+          cartItems.value = cartItems.value.filter(
+            (i) => i.product._id !== productId
+          );
+        } catch (err) {
+          console.error("Failed to remove item:", err);
+          alert("Could not remove item.");
+        }
+      };
+  
+      /** ----------------------------
+       * TOTAL PRICE
+       ----------------------------- */
+      const totalPrice = computed(() =>
+        cartItems.value.reduce(
+          (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+          0
+        )
+      );
+  
+      /** ----------------------------
+       * CHECKOUT (Paystack Init)
+       ----------------------------- */
+      const checkout = () => {
+        if (!cartItems.value.length) return alert("Cart is empty");
+  
+        if (typeof window === "undefined" || !window.PaystackPop) {
+          alert("Payment system not loaded");
+          return;
+        }
+  
+        const handler = window.PaystackPop.setup({
+          key: "pk_test_77963b9442b15cc08d342806983cf5067092ad28",
+          email: "oekisola589@gmail.com",
+          amount: totalPrice.value * 100,
+          metadata: {
+            cart: cartItems.value.map((item) => ({
+              productId: item.product._id,
+              quantity: item.quantity,
+            })),
+          },
+          callback: function (response) {
+            handlePaymentSuccess(response);
+          },
+          onClose: function () {
+            alert("Payment closed");
+          },
         });
-
-        console.log("RAW CART RESPONSE:", res.data);
-
-        let raw = [];
-
-        if (Array.isArray(res.data)) raw = res.data;
-        else if (Array.isArray(res.data.cart)) raw = res.data.cart;
-        else if (Array.isArray(res.data.items)) raw = res.data.items;
-        else if (Array.isArray(res.data.cartItems)) raw = res.data.cartItems;
-
-        cartItems.value = raw
-          .filter(item => item && item.productId && item.productId._id)
-          .map(item => ({
-            _id: item._id,
-            quantity: item.quantity ?? 1,
-            product: item.productId
-          }));
-
-      } catch (err) {
-        console.error("Failed to fetch cart:", err);
-      }
-    };
-
-    /** -------------------------------------------------------
-     * UPDATED QUANTITY FUNCTION (only this was modified)
-     * - Instantly updates UI
-     * - Sends request to backend
-     * - DOES NOT change product card price
-     -------------------------------------------------------- */
-    const updateQuantity = async (productId, newQuantity) => {
-      if (newQuantity < 1) return;
-
-      // ---- instant frontend update ----
-      const item = cartItems.value.find(i => i.product._id === productId);
-      if (item) item.quantity = newQuantity;
-
-      try {
-        await axios.put(
-          "https://wig-api.onrender.com/api/cart/update",
-          { productId, quantity: newQuantity },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-      } catch (err) {
-        console.error("Failed to update quantity:", err);
-        alert("Could not update quantity.");
-      }
-    };
-
-    /** ----------------------------
-     * REMOVE ITEM
-     ----------------------------- */
-    const removeFromCart = async (productId) => {
-      try {
-        await axios.delete(
-          `https://wig-api.onrender.com/api/cart/remove/${productId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        cartItems.value = cartItems.value.filter(i => i.product._id !== productId);
-      } catch (err) {
-        console.error("Failed to remove item:", err);
-        alert("Could not remove item.");
-      }
-    };
-
-    /** ----------------------------
-     * TOTAL PRICE
-     ----------------------------- */
-    const totalPrice = computed(() =>
-      cartItems.value.reduce(
-        (sum, item) => sum + (item.product?.price || 0) * item.quantity,
-        0
-      )
-    );
-
-    /** ----------------------------
-     * CHECKOUT
-     ----------------------------- */
-    const checkout = () => {
-      if (!cartItems.value.length) return alert("Your cart is empty.");
-      alert(`Proceed to checkout — Total: ₦${totalPrice.value.toLocaleString()}`);
-    };
-
-    /** ----------------------------
-     * LISTEN FOR CART UPDATES
-     ----------------------------- */
-    window.addEventListener("cart-updated", fetchCart);
-
-    onMounted(fetchCart);
-
-    onBeforeUnmount(() => {
-      window.removeEventListener("cart-updated", fetchCart);
-    });
-
-    return {
-      cartItems,
-      updateQuantity,
-      removeFromCart,
-      totalPrice,
-      checkout
-    };
-  },
-};
-</script>
+  
+        handler.openIframe();
+      };
+  
+      const handlePaymentSuccess = async (response) => {
+        try {
+          await axios.get(
+            `https://wig-api.onrender.com/api/paystack/verify/${response.reference}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+  
+          alert("Payment successful!");
+          cartItems.value = [];
+          window.location.href = "/cart";
+        } catch (err) {
+          console.error(err);
+          alert("Payment verified, but could not update cart");
+        }
+      };
+  
+      /** ----------------------------
+       * LISTEN FOR CART UPDATES
+       ----------------------------- */
+      onMounted(() => {
+        fetchCart();
+  
+        if (typeof window !== "undefined") {
+          window.addEventListener("cart-updated", fetchCart);
+        }
+      });
+  
+      onBeforeUnmount(() => {
+        if (typeof window !== "undefined") {
+          window.removeEventListener("cart-updated", fetchCart);
+        }
+      });
+  
+      return {
+        cartItems,
+        updateQuantity,
+        removeFromCart,
+        totalPrice,
+        checkout,
+      };
+    },
+  };
+  </script>
+  
 
 <style scoped>
 * {

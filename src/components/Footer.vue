@@ -40,9 +40,12 @@
             <div class="space-y-3">
             <h3 class="font-medium text-lg">Information</h3>
             <ul class="space-y-6 text-sm opacity-90">
-                <li><RouterLink to="/headsizeguide`" class="hover:opacity-60">Head Size Guide</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Contact us</a></li>
+                <li><RouterLink to="/headsizeguide" class="hover:opacity-60">Head Size Guide</RouterLink></li>
+                <li><RouterLink to="/contact-us" class="hover:opacity-60">Contact us</RouterLink></li>
                 <li><a href="#" class="hover:opacity-60">Career</a></li>
+                <li><a href="#" class="hover:opacity-60">Head Size Guide</a></li>
+                <li><RouterLink to="/contact-us" class="hover:opacity-60">Contact us</RouterLink></li>
+                <li><a class="hover:opacity-60">Career</a></li>
                 <li><a href="#" class="hover:opacity-60">My Account</a></li>
             </ul>
             </div>
