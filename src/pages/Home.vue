@@ -108,109 +108,51 @@
         </div>
       </section>
 
-      <section className="max-w-8xl mx-auto py-20 px-6">
-
-
-        <h2 className="text-center text-3xl font-semibold text-[#4A2C28]">
-        Featured Products
+      <section class="max-w-8xl mx-auto py-20 px-6">
+        <h2 class="text-center text-3xl font-semibold text-[#4A2C28]">
+          Featured Products
         </h2>
-        <p className="text-center text-[#7A5F58] mt-2">
-        Handpicked selections from our premium collections
+        <p class="text-center text-[#7A5F58] mt-2">
+          Handpicked selections from our premium collections
         </p>
 
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[27px] mt-12">
 
-        <<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-[27px] mt-12">
+          <div
+            v-for="item in featuredProducts"
+            :key="item._id"
+            class="w-[340px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 px-[25px] py-[20px]"
+          >
+            <img
+              :src="item.image"
+              class="w-auto h-[384px] object-cover rounded-lg"
+            />
 
-        <div className="w-[340px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 px-[20px] py-[20px] ">
-          <img
-            src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png"
-            className="w-auto h-[384px] object-cover rounded-lg"
-          />
-          <div className="p-4">
-            <h3 className="text-[18px] font-normal text-[#4A2C28] mb-[8px]">
-              Luxury 16 Body wave Raw Hair
-            </h3>
-            <p className="text-[14px] text-[#6A2E18] mb-[18px]">
-              Premium human hair collection
-            </p>
+            <div class="p-4">
+              <h3 class="text-[18px] font-medium text-[#4A2C28] mb-[8px]">
+                {{ item.name }}
+              </h3>
 
-            <div className="flex items-center justify-between mt-4">
-              <span className="font-medium text-[#4A2C28] text-[20px]">$299</span>
-              <button className="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] text-white text-xs text-[18px] rounded-md py-2 px-4 transition w-[143px] h-[45px]">
-                Add to Cart
-              </button>
+              <p class="text-[14px] text-[#6A2E18] mb-[18px]">
+                {{ item.description || 'Premium collection' }}
+              </p>
+
+              <div class="flex items-center justify-between mt-4">
+                <span class="font-medium text-[#6A2E18] text-[20px]">
+                  ${{ item.price }}
+                </span>
+
+                <button
+                  @click="addToCart(item._id)"
+                  class="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] text-white text-[18px] rounded-md py-2 px-4 transition w-[143px] h-[45px]"
+                >
+                  Add to Cart
+                </button>
+              </div>
             </div>
           </div>
+
         </div>
-
-        <div className="w-[340px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 px-[25px] py-[20px]">
-          <img
-            src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/hairaccecories1.png"
-            className="w-auto h-[384px] object-cover rounded-lg"
-          />
-          <div className="p-4">
-            <h3 className="text-[18px] font-medium text-[#4A2C28] mb-[8px]">
-              Vent Hair Brush
-            </h3>
-            <p className="text-[14px] text-[#6A2E18] mb-[18px]">
-              Premium hair care essentials
-            </p>
-
-            <div className="flex items-center justify-between mt-4">
-              <span className="font-medium text-[#6A2E18] text-[20px]">$9.2</span>
-              <button className="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] text-white text-[18px] text-xs rounded-md py-2 px-4 transition w-[143px] h-[45px]">
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="w-[340px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 px-[25px] py-[20px]">
-          <img
-            src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair1.png"
-            className="w-auto h-[384px] object-cover rounded-lg"
-          />
-          <div className="p-4">
-            <h3 className="text-[18px] font-medium text-[#4A2C28] mb-[8px]">
-              18” Ashblonde Bodywave
-            </h3>
-            <p className="text-[14px] text-[#6A2E18] mb-[18px]">
-              Premium human hair collection
-            </p>
-
-            <div className="flex items-center justify-between mt-4">
-              <span className="font-medium text-[#6A2E18] text-[20px]">$300</span>
-              <button className="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] text-white text-[18px] text-xs rounded-md py-2 px-4 transition w-[143px] h-[45px]">
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="w-[340px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 px-[25px] py-[20px]">
-          <img
-            src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair2.png"
-            className="w-auto h-[384px] object-cover rounded-lg"
-          />
-          <div className="p-4">
-            <h3 className="text-[18px] font-medium text-[#4A2C28] mb-[8px]">
-              14” Kinky Straight 7×5 Hair
-            </h3>
-            <p className="text-[14px] text-[#6A2E18] mb-[18px]">
-              Premium human hair collection
-            </p>
-
-            <div className="flex items-center justify-between mt-4">
-              <span className="font-medium text-[#6A2E18] text-[20px]">$299</span>
-              <button className="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] text-white text-xs text-[18px] rounded-md py-2 px-4 transition w-[143px] h-[45px]">
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-
-</div>
-
       </section>
 
       <section className="max-w-6xl mx-auto py-20 px-6">
@@ -285,23 +227,55 @@
     </div>
   </template>
   
-<script setup>
-import { ref, onMounted } from 'vue'
-
-const images = [
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage10.jpg",
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage11.webp",
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage15.jpg",
-  "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage16.jpg"
-]
-
-const currentIndex = ref(0)
-
-onMounted(() => {
-  setInterval(() => {
-    currentIndex.value = (currentIndex.value + 1) % images.length
-  }, 4000) // auto-slide every 4s
-})
-</script>
+  <script setup>
+    import { ref, onMounted } from "vue";
+    import axios from "axios";
+    
+    const images = [
+      "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage10.jpg",
+      "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage11.webp",
+      "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage15.jpg",
+      "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage16.jpg"
+    ];
+    
+    const currentIndex = ref(0);
+    const featuredProducts = ref([]);
+    
+    const loadFeaturedProducts = async () => {
+      try {
+        const res = await axios.get("https://wig-api.onrender.com/api/products");
+        const allProducts = res.data.products || res.data || [];
+        featuredProducts.value = allProducts.slice(0, 4);
+      } catch (err) {
+        console.error("Failed to load featured products:", err);
+      }
+    };
+    
+    const addToCart = async (productId) => {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("Please log in first.");
+    
+      try {
+        await axios.post(
+          "https://wig-api.onrender.com/api/cart/add",
+          { productId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+    
+        window.dispatchEvent(new Event("cart-updated"));
+        alert("Added to cart!");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to add to cart.");
+      }
+    };
+    
+    onMounted(() => {
+      loadFeaturedProducts();
+      setInterval(() => {
+        currentIndex.value = (currentIndex.value + 1) % images.length;
+      }, 4000);
+    });
+    </script>
 
   

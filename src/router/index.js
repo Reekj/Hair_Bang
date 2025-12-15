@@ -10,6 +10,7 @@ import Admin from '../pages/Admin.vue'
 import Cart from '../pages/Cart.vue'
 import HeadSizeGuide from '../pages/HeadSizeGuide.vue'
 import Favorites from '../pages/Favorites.vue'
+import Directions from '../pages/Directions.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -27,6 +28,7 @@ const routes = [
   { path:'/contact-us', name: 'ContactUs', component: () => import('../pages/Contact.vue') },
   { path:'/FAQ', name: 'FAQ', component: () => import('../pages/FAQ.vue') },
   { path:'/favorites', name: 'favorites', component: Favorites },
+  { path:'/directions', name: 'directions', component: Directions },
 
   {
     path: '/product/:id',

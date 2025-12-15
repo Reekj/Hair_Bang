@@ -16,7 +16,12 @@
 
             <!-- Contact Lines -->
             <div class="text-sm space-y-6">
-                <p class="font-semibold">GET DIRECTION</p>
+                <RouterLink
+                    to="/directions"
+                    class="text-sm space-y-6 cursor-pointer hover:opacity-80 transition"
+                    >
+                    <p class="font-semibold">GET DIRECTION</p>
+                </RouterLink>
                 <p class="flex items-center gap-2">
                 <span class="text-sm"><img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/messageicon.png" alt=""></span> shop@herhairbang.com
                 </p>
@@ -42,11 +47,8 @@
             <ul class="space-y-6 text-sm opacity-90">
                 <li><RouterLink to="/headsizeguide" class="hover:opacity-60">Head Size Guide</RouterLink></li>
                 <li><RouterLink to="/contact-us" class="hover:opacity-60">Contact us</RouterLink></li>
-                <li><a href="#" class="hover:opacity-60">Career</a></li>
-                <li><a href="#" class="hover:opacity-60">Head Size Guide</a></li>
-                <li><RouterLink to="/contact-us" class="hover:opacity-60">Contact us</RouterLink></li>
-                <li><a class="hover:opacity-60">Career</a></li>
-                <li><a href="#" class="hover:opacity-60">My Account</a></li>
+                <!-- <li><a href="" class="hover:opacity-60">Career</a></li> -->
+                <!-- <li><a href="#" class="hover:opacity-60">My Account</a></li> -->
             </ul>
             </div>
 
