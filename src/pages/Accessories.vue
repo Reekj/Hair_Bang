@@ -129,6 +129,7 @@
 
 <script>
 import axios from "axios";
+import { toast } from "../stores/toast.js";
 
 export default {
   name: "HairAccessoriesPage",
@@ -189,14 +190,14 @@ export default {
         );
 
         if (res.data?.success || res.status === 200) {
-          alert(res.data?.message || "Added to cart!");
+          toast.show("Product added to cart!", "success");
           window.dispatchEvent(new Event("cart-updated"));
         } else {
-          alert(res.data?.message || "Failed to add to cart.");
+          toast.show("Failed to add product to cart.", "error");
         }
       } catch (err) {
         console.error("Add to cart failed:", err);
-        alert("Failed to add to cart.");
+        toast.show("Error adding product to cart.", "error");
       }
     },
 
