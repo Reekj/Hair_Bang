@@ -44,7 +44,7 @@
             <label class="block font-semibold">Product Image</label>
             <input
               type="file"
-              @change="handleFileUpload"
+              @change="handleMultipleFiles"
               class="w-full border p-2 rounded"
               accept="image/*"
               multiple
@@ -214,7 +214,7 @@ const form = ref({
   name: "",
   price: "",
   discountedPrice: null,
-  image: [],
+  images: [],
   description: "",
   category: "",
   quantity: 0,
@@ -274,7 +274,7 @@ const editProduct = (p) => {
     name: p.name,
     price: p.price,
     discountedPrice: p.discountedPrice ?? null,
-    image: p.image,
+    images: p.images || [],
     description: p.description,
     category: p.category?._id || "",
     quantity: p.quantity || 0,
@@ -333,7 +333,7 @@ const resetForm = () => {
     name: "",
     price: "",
     discountedPrice: null,
-    image: "",
+    images: [],
     description: "",
     category: "",
     quantity: 0,
