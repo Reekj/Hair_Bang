@@ -28,14 +28,36 @@
             />
           </div>
 
-          <div class="md:col-span-2">
+          <div>
+            <label class="block font-semibold"
+              >Discounted Price (optional)</label
+            >
+            <input
+              v-model.number="form.discountedPrice"
+              type="number"
+              class="w-full border p-2 rounded"
+              min="0"
+            />
+          </div>
+
+          <div>
             <label class="block font-semibold">Product Image</label>
             <input
               type="file"
-              @change="handleFileUpload"
+              @change="handleMultipleFiles"
               class="w-full border p-2 rounded"
               accept="image/*"
+              multiple
             />
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block font-semibold">Description</label>
+            <textarea
+              v-model="form.description"
+              class="w-full border p-2 rounded"
+              required
+            ></textarea>
           </div>
 
           <div>
@@ -47,15 +69,6 @@
               min="0"
               required
             />
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="block font-semibold">Description</label>
-            <textarea
-              v-model="form.description"
-              class="w-full border p-2 rounded"
-              required
-            ></textarea>
           </div>
 
           <div>
@@ -76,7 +89,8 @@
         <div class="mt-4 flex gap-4">
           <button
             type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            :disabled="!isDiscountValid"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           >
             {{ editMode ? "Update" : "Add Product" }}
           </button>
@@ -106,6 +120,7 @@
             <th class="border p-2">Image</th>
             <th class="border p-2">Name</th>
             <th class="border p-2">Price</th>
+            <th class="border p-2">Discounted Price</th>
             <th class="border p-2">Description</th>
             <th class="border p-2">Category</th>
             <th class="border p-2">Stock</th>
@@ -116,10 +131,26 @@
         <tbody>
           <tr v-for="p in products" :key="p._id">
             <td class="border p-2">
-              <img :src="p.image" class="h-16 w-16 object-cover rounded" />
+              <img :src="p.images[0]" class="h-16 w-16 object-cover rounded" />
             </td>
             <td class="border p-2">{{ p.name }}</td>
             <td class="border p-2">₦{{ p.price }}</td>
+            <td class="border p-2">
+              <div v-if="p.discountedPrice !== null">
+                <span class="line-through text-gray-400"> ₦{{ p.price }} </span>
+                <br />
+                <span class="text-green-600 font-bold">
+                  ₦{{ p.discountedPrice }}
+                </span>
+                <span class="text-xs text-red-600 font-semibold">
+                  {{
+                    Math.round(((p.price - p.discountedPrice) / p.price) * 100)
+                  }}% OFF
+                </span>
+              </div>
+              <span v-else>₦{{ p.price }}</span>
+            </td>
+
             <td class="border p-2">{{ p.description }}</td>
             <td class="border p-2">
               {{ p.category?.name || "No Category" }}
@@ -163,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import axios from "axios";
 import { toast } from "../stores/toast";
 
@@ -182,10 +213,18 @@ const categories = ref([]);
 const form = ref({
   name: "",
   price: "",
-  image: "",
+  discountedPrice: null,
+  images: [],
   description: "",
   category: "",
   quantity: 0,
+});
+
+const isDiscountValid = computed(() => {
+  return (
+    form.value.discountedPrice === null ||
+    form.value.discountedPrice < form.value.price
+  );
 });
 
 // Load products
@@ -234,7 +273,8 @@ const editProduct = (p) => {
   form.value = {
     name: p.name,
     price: p.price,
-    image: p.image,
+    discountedPrice: p.discountedPrice ?? null,
+    images: p.images || [],
     description: p.description,
     category: p.category?._id || "",
     quantity: p.quantity || 0,
@@ -292,32 +332,38 @@ const resetForm = () => {
   form.value = {
     name: "",
     price: "",
-    image: "",
+    discountedPrice: null,
+    images: [],
     description: "",
     category: "",
     quantity: 0,
   };
 };
-const handleFileUpload = async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+const handleMultipleFiles = async (event) => {
+  const files = Array.from(event.target.files);
+  const uploadedUrls = [];
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", "unsigned_upload"); // replace
-  formData.append("cloud_name", "db0x4d6a8"); // replace
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "unsigned_upload");
+    formData.append("cloud_name", "db0x4d6a8");
 
-  try {
-    const res = await axios.post(
-      "https://api.cloudinary.com/v1_1/db0x4d6a8/image/upload",
-      formData
-    );
-
-    form.value.image = res.data.secure_url; // auto-fill image URL
-  } catch (err) {
-    toast.show("Image upload failed", "error");
+    try {
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/db0x4d6a8/image/upload",
+        formData
+      );
+      uploadedUrls.push(res.data.secure_url);
+    } catch (err) {
+      toast.show("Image upload failed for one of the files", "error");
+    }
   }
+
+  form.value.images = uploadedUrls; // save all uploaded URLs
 };
+
+
 
 onMounted(loadProducts);
 onMounted(loadCategories);

@@ -138,7 +138,7 @@ async function handleRegister() {
     });
 
     if (!res.ok) {
-      alert(`Registration failed: ${text}`);
+      toast.show("Registration failed. Please try again.", "error");
       return;
     }
 
@@ -153,7 +153,7 @@ async function handleRegister() {
 
   } catch (err) {
     console.error('Registration error:', err);
-    alert('Something went wrong. Please try again.');
+    toast.show("An error occurred during registration.", "error");
   }
 }
 </script>
