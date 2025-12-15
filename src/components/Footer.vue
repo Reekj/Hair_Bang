@@ -24,13 +24,13 @@
 
             <!-- Social Icons -->
             <div class="flex items-center gap-6 text-xl">
-                <a href="#" class="hover:opacity-60">
+                <a href="https://www.facebook.com/share/1WB6e7TJTV/?mibextid=wwXIfr" class="hover:opacity-60">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/fblogo.png" alt="">
                 </a>
-                <a href="#" class="hover:opacity-60">
+                <a href="https://www.instagram.com/herhairbang?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="hover:opacity-60">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/ig_icon.png" alt="">
                 </a>
-                <a href="#" class="hover:opacity-60">
+                <a href="https://www.tiktok.com/@herhairbang.uk?_r=1&_t=ZS-92EnNRmKBZl" class="hover:opacity-60">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/tiktoklogo.png" alt="">
                 </a>
             </div>

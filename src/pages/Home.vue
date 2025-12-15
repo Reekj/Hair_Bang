@@ -24,7 +24,8 @@
             <button
               class="bg-gradient-to-r from-[#B13F32] to-[#4B1B15] h-[66px] w-[228px] mt-2 bg-[#B15C32] text-[20px] text-white text-semibold px-[34px] py-[17px] rounded-xl font-medium hover:bg-[#582614] transition"
             >
-              Shop Collection
+            <RouterLink to="/wigs" >Shop Collection</RouterLink>
+              
             </button>
           </div>
 
