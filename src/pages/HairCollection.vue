@@ -75,9 +75,15 @@
             :alt="item.name"
           />
 
-          <button class="absolute top-3 right-3 bg-none p-2 rounded-full">
+          <!-- Favorites Heart -->
+          <button
+            class="absolute top-3 right-3 bg-none p-2 rounded-full"
+            @click="toggleFavorite(item._id)"
+          >
             <img 
-              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
+              :src="favorites.includes(item._id) 
+                     ? 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-heart-filled.svg'
+                     : 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png'"
               class="w-6 h-6"
             />
           </button>
@@ -121,77 +127,133 @@
 </template>
 
 <script>
-import axios from "axios";
-
-export default {
-  name: "WigsPage",
-  data() {
-    return {
-      products: [],
-      loading: true,
-      error: null,
-      search: ""
-    };
-  },
-  computed: {
-    filteredProducts() {
-      if (!this.search) return this.products;
-      const q = this.search.toLowerCase().trim();
-      return this.products.filter(p =>
-        (p.name || "").toLowerCase().includes(q) ||
-        (p.description || "").toLowerCase().includes(q)
-      );
-    }
-  },
-  async mounted() {
-    await this.loadProducts();
-  },
-  methods: {
-    async loadProducts() {
-      this.loading = true;
-      try {
-        const res = await axios.get("https://wig-api.onrender.com/api/products");
-        const allProducts = res.data.products || res.data || [];
-
-        // Filter by category slug (wigs)
-        this.products = allProducts.filter(
-          (p) => p.category?.slug === "wigs"
+  import axios from "axios";
+  
+  export default {
+    name: "WigsPage",
+    data() {
+      return {
+        products: [],
+        favorites: [], // <-- WILL STORE PRODUCT IDs ONLY
+        loading: true,
+        error: null,
+        search: ""
+      };
+    },
+    computed: {
+      filteredProducts() {
+        if (!this.search) return this.products;
+        const q = this.search.toLowerCase().trim();
+        return this.products.filter(p =>
+          (p.name || "").toLowerCase().includes(q) ||
+          (p.description || "").toLowerCase().includes(q)
         );
-      } catch (err) {
-        console.error(err);
-        this.error = "Failed to load products.";
-      } finally {
-        this.loading = false;
       }
     },
-
-    async addToCart(productId) {
-      const token = localStorage.getItem("token");
-      if (!token) return alert("You need to log in first.");
-
-      try {
-        const res = await axios.post(
-          "https://wig-api.onrender.com/api/cart/add",
-          { productId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        // Prefer backend success flag/message if available
-        if (res.data?.success || res.status === 200) {
-          alert(res.data?.message || "Added to cart!");
-          // Broadcast an event so Cart page can refresh
-          window.dispatchEvent(new Event("cart-updated"));
-        } else {
-          alert(res.data?.message || "Failed to add to cart.");
+    async mounted() {
+      await this.loadProducts();
+      await this.loadFavorites();
+      window.addEventListener("favorites-updated", this.loadFavorites);
+    },
+    beforeUnmount() {
+      window.removeEventListener("favorites-updated", this.loadFavorites);
+    },
+    methods: {
+      async loadProducts() {
+        this.loading = true;
+        try {
+          const res = await axios.get("https://wig-api.onrender.com/api/products");
+          const allProducts = res.data.products || res.data || [];
+  
+          this.products = allProducts.filter(
+            (p) => p.category?.slug === "wigs"
+          );
+        } catch (err) {
+          console.error(err);
+          this.error = "Failed to load products.";
+        } finally {
+          this.loading = false;
         }
-      } catch (err) {
-        console.error("Add to cart failed:", err);
-        alert("Failed to add to cart.");
+      },
+  
+      async addToCart(productId) {
+        const token = localStorage.getItem("token");
+        if (!token) return alert("You need to log in first.");
+  
+        try {
+          const res = await axios.post(
+            "https://wig-api.onrender.com/api/cart/add",
+            { productId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+  
+          if (res.data?.success || res.status === 200) {
+            alert(res.data?.message || "Added to cart!");
+            window.dispatchEvent(new Event("cart-updated"));
+          } else {
+            alert(res.data?.message || "Failed to add to cart.");
+          }
+        } catch (err) {
+          console.error("Add to cart failed:", err);
+          alert("Failed to add to cart.");
+        }
+      },
+  
+      /* =========================
+         FAVORITES (FIXED)
+      ========================== */
+  
+      async loadFavorites() {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+  
+        try {
+          const res = await axios.get(
+            "https://wig-api.onrender.com/api/favorites",
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+  
+          // ✅ STORE PRODUCT IDs ONLY
+          this.favorites = res.data
+            .map(f => f.productId?._id)
+            .filter(Boolean);
+  
+        } catch (err) {
+          console.error("Failed to load favorites:", err);
+        }
+      },
+  
+      async toggleFavorite(productId) {
+        const token = localStorage.getItem("token");
+        if (!token) return alert("You need to log in first.");
+  
+        const isFav = this.favorites.includes(productId);
+  
+        try {
+          if (!isFav) {
+            await axios.post(
+              "https://wig-api.onrender.com/api/favorites/add",
+              { productId },
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            this.favorites.push(productId);
+          } else {
+            await axios.delete(
+              `https://wig-api.onrender.com/api/favorites/remove/${productId}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            this.favorites = this.favorites.filter(id => id !== productId);
+          }
+  
+          window.dispatchEvent(new Event("favorites-updated"));
+        } catch (err) {
+          console.error("Favorite toggle failed:", err);
+        }
       }
-    },
-  },
-};
-</script>
+    }
+  };
+  </script>
+  
 
 <style scoped>
 .filter-select {
@@ -203,3 +265,4 @@ export default {
   box-sizing: border-box;
 }
 </style>
+``

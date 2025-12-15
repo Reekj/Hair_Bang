@@ -8,6 +8,7 @@ import Jeans from '../pages/Jeans.vue'
 import ProductDetails from '../pages/ProductDetails.vue'
 import Admin from '../pages/Admin.vue'
 import Cart from '../pages/Cart.vue'
+import HeadSizeGuide from '../pages/HeadSizeGuide.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -21,6 +22,8 @@ const routes = [
   { path: '/privacy', name: 'Privacy', component: () => import('../pages/Privacy.vue') },
   { path: '/terms-condition', name: 'TermsAndCondition', component: () => import('../pages/TermsAndConditions.vue') },
   { path: '/refund', name: 'RefundPolicy', component: () => import('../pages/RefundPolicy.vue') },
+  { path: '/favorites', name: 'favorites', component: () => import('../pages/Favorites.vue') },
+  { path: '/headsizeguide', name: 'headsizeguide', component: HeadSizeGuide},
   {
     path: '/product/:id',
     name: 'ProductDetails',

@@ -72,9 +72,14 @@
           />
 
           <!-- Heart Icon -->
-          <button class="absolute top-3 right-3 bg-none p-2 rounded-full">
+          <button 
+            class="absolute top-3 right-3 bg-none p-2 rounded-full"
+            @click="toggleFavorite(item._id)"
+          >
             <img 
-              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
+              :src="favorites.includes(item._id) 
+                     ? 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-heart-filled.svg'
+                     : 'https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png'"
               class="w-6 h-6"
             />
           </button>
@@ -130,6 +135,7 @@ export default {
   data() {
     return {
       products: [],
+      favorites: [],
       loading: true,
       error: null,
       search: ""
@@ -147,6 +153,11 @@ export default {
   },
   async mounted() {
     await this.loadProducts();
+    await this.loadFavorites();
+    window.addEventListener("favorites-updated", this.loadFavorites);
+  },
+  beforeUnmount() {
+    window.removeEventListener("favorites-updated", this.loadFavorites);
   },
   methods: {
     async loadProducts() {
@@ -155,7 +166,6 @@ export default {
         const res = await axios.get("https://wig-api.onrender.com/api/products");
         const allProducts = res.data.products || res.data || [];
 
-        // Filter by category slug (adjust to match your backend slug exactly)
         this.products = allProducts.filter(
           (p) => p.category?.slug === "hair-accessories" || p.category?.slug === "hair accessories"
         );
@@ -187,6 +197,57 @@ export default {
       } catch (err) {
         console.error("Add to cart failed:", err);
         alert("Failed to add to cart.");
+      }
+    },
+
+    /** ----------------------------
+     * FAVORITES LOGIC
+     ----------------------------- */
+    async loadFavorites() {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get(
+          "https://wig-api.onrender.com/api/favorites",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // map to product IDs for the hearts
+        this.favorites = (res.data || []).map(f => f.productId?._id || f._id).filter(Boolean);
+
+      } catch (err) {
+        console.error("Failed to load favorites:", err);
+      }
+    },
+
+    async toggleFavorite(productId) {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("You need to log in first.");
+
+      const isFav = this.favorites.includes(productId);
+
+      try {
+        if (!isFav) {
+          await axios.post(
+            "https://wig-api.onrender.com/api/favorites/add",
+            { productId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          this.favorites.push(productId);
+        } else {
+          await axios.delete(
+            `https://wig-api.onrender.com/api/favorites/remove/${productId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          this.favorites = this.favorites.filter(id => id !== productId);
+        }
+
+        // notify other pages
+        window.dispatchEvent(new Event("favorites-updated"));
+      } catch (err) {
+        console.error("Failed to update favorite:", err);
+        alert("Could not update favorite.");
       }
     },
   },

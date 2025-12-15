@@ -51,9 +51,7 @@
             </div>
 
             <div class="flex gap-3">
-              <span class="w-4 h-4 rounded-full bg-black cursor-pointer"></span>
-              <span class="w-4 h-4 rounded-full bg-[#7A1F1F] cursor-pointer"></span>
-              <span class="w-4 h-4 rounded-full bg-[#D4A373] cursor-pointer"></span>
+              <span v-for="color in product.colors" :key="color" :style="{backgroundColor: color}" class="w-4 h-4 rounded-full cursor-pointer"></span>
             </div>
           </div>
         </div>
@@ -91,76 +89,79 @@
 
 <script>
 import axios from 'axios';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   name: "ProductDetails",
 
-  data() {
-    return {
-      qty: 1,
-      product: {
-        title: "Luxury 16 Body Wave Raw Hair",
-        price: 299,
-        image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png",
-        images: [
-          "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png",
-          "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair3.jpg",
-          "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair2.png"
-        ],
-        description: [
-          "Pre-bleached knots",
-          "Pre-styled as pictured",
-          "Picture is the exact product",
-          "Sleek, Smooth Texture",
-          "Versatile Styling",
-          "Durable and Long-lasting",
-          "Blends Seamlessly",
-          "Available in Various Colors and Lengths"
-        ],
-        id: 1
-      },
-      reviews: [
-        "Absolutely love this wig! The quality is amazing and it looks so natural. I've gotten compliments all day!",
-        "Worth every naira. It's full, true to length, and arrived exactly as described.",
-        "The wig exceeded my expectations. Lightweight, comfortable, and looks just like my natural hair."
-      ]
-    };
-  },
+  setup() {
+    const route = useRoute();
+    const productId = route.params.id; // get product ID from URL
+    const qty = ref(1);
+    const product = ref({
+      title: "",
+      price: 0,
+      image: "",
+      images: [],
+      description: [],
+      colors: ["#000000", "#7A1F1F", "#D4A373"] // default colors
+    });
+    const reviews = ref([]);
 
-  methods: {
-    increaseQty() {
-      this.qty++;
-    },
-    decreaseQty() {
-      if (this.qty > 1) this.qty--;
-    },
-
-    async addToCart() {
+    // Fetch product data dynamically
+    const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem("token"); // user must be logged in
+        const res = await axios.get(`https://wig-api.onrender.com/api/products/${productId}`);
+        const data = res.data.product || res.data;
+        product.value = {
+          title: data.name,
+          price: data.price,
+          image: data.image,
+          images: data.images || [data.image],
+          description: Array.isArray(data.description) ? data.description : [data.description || ""],
+          colors: data.colors || ["#000000", "#7A1F1F", "#D4A373"]
+        };
+        reviews.value = data.reviews || [];
+      } catch (err) {
+        console.error("Failed to fetch product:", err);
+      }
+    };
+
+    const increaseQty = () => { qty.value++; };
+    const decreaseQty = () => { if (qty.value > 1) qty.value--; };
+
+    const addToCart = async () => {
+      try {
+        const token = localStorage.getItem("token");
         if (!token) {
           alert("Please log in to add items to your cart.");
           return;
         }
 
-        const payload = {
-          productId: this.product.id.toString(),
-          quantity: this.qty
-        };
-
-        await axios.post("https://wig-api.onrender.com/api/cart/add", payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-
+        await axios.post(
+          "https://wig-api.onrender.com/api/cart/add",
+          { productId, quantity: qty.value },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         alert("Added to cart successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to add to cart. Please try again.");
+        window.dispatchEvent(new Event("cart-updated"));
+      } catch (err) {
+        console.error(err);
+        alert("Failed to add to cart.");
       }
-    }
+    };
+
+    onMounted(fetchProduct);
+
+    return {
+      product,
+      reviews,
+      qty,
+      increaseQty,
+      decreaseQty,
+      addToCart
+    };
   }
 };
 </script>

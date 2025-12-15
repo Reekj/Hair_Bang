@@ -30,7 +30,7 @@
 
         <!-- Price -->
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
-          ₦{{ (item.product.price * item.quantity).toLocaleString() }}
+          ₦{{ item.product.price.toLocaleString() }}
         </p>
 
         <!-- Quantity Controls -->
@@ -115,7 +115,6 @@ export default {
         else if (Array.isArray(res.data.items)) raw = res.data.items;
         else if (Array.isArray(res.data.cartItems)) raw = res.data.cartItems;
 
-        // Filter out invalid/null product entries
         cartItems.value = raw
           .filter(item => item && item.productId && item.productId._id)
           .map(item => ({
@@ -129,11 +128,18 @@ export default {
       }
     };
 
-    /** ----------------------------
-     * UPDATE QUANTITY
-     ----------------------------- */
+    /** -------------------------------------------------------
+     * UPDATED QUANTITY FUNCTION (only this was modified)
+     * - Instantly updates UI
+     * - Sends request to backend
+     * - DOES NOT change product card price
+     -------------------------------------------------------- */
     const updateQuantity = async (productId, newQuantity) => {
       if (newQuantity < 1) return;
+
+      // ---- instant frontend update ----
+      const item = cartItems.value.find(i => i.product._id === productId);
+      if (item) item.quantity = newQuantity;
 
       try {
         await axios.put(
@@ -141,9 +147,6 @@ export default {
           { productId, quantity: newQuantity },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        const item = cartItems.value.find(i => i.product._id === productId);
-        if (item) item.quantity = newQuantity;
       } catch (err) {
         console.error("Failed to update quantity:", err);
         alert("Could not update quantity.");
@@ -212,4 +215,3 @@ export default {
   box-sizing: border-box;
 }
 </style>
-``

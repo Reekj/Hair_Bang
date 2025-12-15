@@ -40,7 +40,7 @@
             <div class="space-y-3">
             <h3 class="font-medium text-lg">Information</h3>
             <ul class="space-y-6 text-sm opacity-90">
-                <li><a href="#" class="hover:opacity-60">Head Size Guide</a></li>
+                <li><RouterLink to="/headsizeguide`" class="hover:opacity-60">Head Size Guide</RouterLink></li>
                 <li><a href="#" class="hover:opacity-60">Contact us</a></li>
                 <li><a href="#" class="hover:opacity-60">Career</a></li>
                 <li><a href="#" class="hover:opacity-60">My Account</a></li>
@@ -56,7 +56,7 @@
                 <li><RouterLink to="/privacy">Privacy & Policy</RouterLink></li>
                 <li><RouterLink to="/terms-condition" class="hover:opacity-60">Terms & Conditions</RouterLink></li>
                 <li><a href="#" class="hover:opacity-60">Order FAQs</a></li>
-                <li><a href="#" class="hover:opacity-60">My Wishlist</a></li>
+                <li><RouterLink to="/favorites" class="hover:opacity-60">My Wishlist</RouterLink></li>
             </ul>
             </div>
 
@@ -75,7 +75,7 @@
                     placeholder="Email Address.." 
                     class="w-full bg-white text-black rounded-full p-[12px] text-sm focus:outline-none h-[48px] w-[296px]"
                     />
-                    <button class="absolute top-1/2 -translate-y-1/2 right-0 opacity-70 hover:opacity-100">
+                    <button class="absolute top-1/2 -translate-y-1/2 right-0 mr-[20px] opacity-70 hover:opacity-100">
                     <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mynaui_send.png" alt="">
                     </button>
                 </div>
