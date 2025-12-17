@@ -262,7 +262,7 @@ const addProduct = async () => {
     toast.show("Product added successfully", "success");
     resetForm();
   } catch (err) {
-    alert("Failed to add product");
+    toast.show("Failed to add product", "error");
   }
 };
 

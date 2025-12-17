@@ -215,7 +215,7 @@ export default {
 
     async addToCart(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return alert("You need to log in first.");
+      if (!token) return toast.show("Please log in to add items to cart.", "error");
 
       try {
         const res = await axios.post(
@@ -260,7 +260,7 @@ export default {
 
     async toggleFavorite(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return alert("You need to log in first.");
+      if (!token) return toast.show("Please log in to favorite items.", "error");
 
       const isFav = this.favorites.includes(productId);
 
@@ -284,7 +284,7 @@ export default {
         window.dispatchEvent(new Event("favorites-updated"));
       } catch (err) {
         console.error("Failed to update favorite:", err);
-        alert("Could not update favorite.");
+        toast.show("Could not update favorite.", "error");
       }
     },
   },

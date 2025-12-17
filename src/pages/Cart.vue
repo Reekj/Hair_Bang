@@ -195,7 +195,7 @@ export default {
  * CHECKOUT (Paystack Init)
  ----------------------------- */
     const checkout = () => {
-      if (!cartItems.value.length) return alert("Cart empty");
+      if (!cartItems.value.length) return toast.show("Your cart is empty.", "info");
 
       const handler = PaystackPop.setup({
         key: "pk_test_77963b9442b15cc08d342806983cf5067092ad28",

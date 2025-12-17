@@ -157,7 +157,7 @@ export default {
 
     async addToCart(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return alert("You need to log in first.");
+      if (!token) return toast.show("Please log in to add items to cart.", "error");
 
       await axios.post(
         "https://wig-api.onrender.com/api/cart/add",

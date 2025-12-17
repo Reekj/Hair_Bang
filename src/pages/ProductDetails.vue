@@ -136,6 +136,7 @@
 import axios from "axios";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { toast } from "../stores/toast";
 
 export default {
   name: "ProductDetails",
@@ -189,7 +190,7 @@ export default {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          alert("Please log in to add items to your cart.");
+          toast.show("Please log in to add items to cart.", "error");
           return;
         }
 
@@ -198,11 +199,11 @@ export default {
           { productId, quantity: qty.value },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        alert("Added to cart successfully!");
+        toast.show("Product added to cart!", "success");
         window.dispatchEvent(new Event("cart-updated"));
       } catch (err) {
         console.error(err);
-        alert("Failed to add to cart.");
+        toast.show("Failed to add product to cart.", "error");
       }
     };
 
