@@ -124,7 +124,7 @@
             class="w-[340px] bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 px-[25px] py-[20px]"
           >
             <img
-              :src="item.image"
+              :src="item.images?.[0] || ''"
               class="w-auto h-[384px] object-cover rounded-lg"
             />
 
@@ -230,6 +230,7 @@
   <script setup>
     import { ref, onMounted } from "vue";
     import axios from "axios";
+    import { toast } from "../stores/toast";
     
     const images = [
       "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hairimage10.jpg",
@@ -253,7 +254,7 @@
     
     const addToCart = async (productId) => {
       const token = localStorage.getItem("token");
-      if (!token) return alert("Please log in first.");
+      if (!token) return toast.show("Please log in to add items to cart.", "error");
     
       try {
         await axios.post(
@@ -263,10 +264,10 @@
         );
     
         window.dispatchEvent(new Event("cart-updated"));
-        alert("Added to cart!");
+        toast.show("Product added to cart!", "success");
       } catch (err) {
         console.error(err);
-        alert("Failed to add to cart.");
+        toast.show("Failed to add product to cart.", "error");
       }
     };
     

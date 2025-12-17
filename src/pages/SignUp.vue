@@ -137,24 +137,28 @@ async function handleRegister() {
       })
     });
 
+    const data = await res.json(); // always parse once
+
     if (!res.ok) {
-      toast.show("Registration failed. Please try again.", "error");
+      // Handle known backend messages
+      toast.show(
+        data.message || "Registration failed. Please try again.",
+        "error"
+      );
       return;
     }
-
-    // Fast parse
-    const data = await res.json();
 
     toast.show("Registration successful! Redirecting to login...", "success");
 
     setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      router.push("/login");
+    }, 2000);
 
   } catch (err) {
-    console.error('Registration error:', err);
-    toast.show("An error occurred during registration.", "error");
+    console.error("Registration error:", err);
+    toast.show("Network error. Please check your connection.", "error");
   }
 }
+
 </script>
 
