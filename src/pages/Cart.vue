@@ -80,7 +80,7 @@
       class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 flex flex-col md:flex-row justify-between items-center gap-4"
     >
       <p class="text-[#6A2E18] font-semibold text-lg">
-        Total: ₦{{ totalPrice.toLocaleString() }}
+        Total: ${{ totalPrice.toLocaleString() }}
       </p>
 
       <button
