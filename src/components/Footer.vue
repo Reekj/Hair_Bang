@@ -93,7 +93,7 @@
         <div class="border-t border-[#5A2410] mt-10 pt-4">
             <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between text-sm opacity-80">
             <p>2025 HerHairBang. All Rights Reserved.</p>
-            <p>Powered by Next-It Services</p>
+            <p>Powered by Next-IT Services</p>
             </div>
         </div>
     </footer>

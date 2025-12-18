@@ -25,7 +25,7 @@
         <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 mb-4">
           <img
-            :src="item.image"
+            :src="item.displayImage"
             :alt="item.name"
             class="w-full h-full object-cover rounded-xl"
           />
@@ -63,7 +63,7 @@
 
         <button
           @click="addToCart(item._id)"
-          class="mt-auto mx-4 mb-4 rounded-xl text-white text-sm font-medium h-11"
+          class="mt-4 mx-4 mb-4 rounded-xl text-white text-sm font-medium h-11"
           style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
         >
           Add to Cart
@@ -120,14 +120,24 @@ export default {
         );
         const products = prodRes.data.products || prodRes.data || [];
 
-        // 3️⃣ Normalize favorites
+        // 3️⃣ Normalize favorites + images
         this.favorites = rawFavorites
           .map(fav => {
-            if (typeof fav.productId === "object") {
-              return fav.productId;
-            }
+            let product =
+              typeof fav.productId === "object"
+                ? fav.productId
+                : products.find(p => p._id === fav.productId);
 
-            return products.find(p => p._id === fav.productId);
+            if (!product) return null;
+
+            return {
+              ...product,
+              displayImage:
+                product.image ||
+                (Array.isArray(product.images) && product.images.length
+                  ? product.images[0]
+                  : "https://via.placeholder.com/400x400")
+            };
           })
           .filter(Boolean);
 
