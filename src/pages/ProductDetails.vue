@@ -8,7 +8,7 @@
           class="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[854px] bg-white rounded-xl overflow-hidden shadow"
         >
           <img
-            :src="product.images?.[0] || 'https://via.placeholder.com/600x800'"
+            :src="selectedImage || 'https://via.placeholder.com/600x800'"
             class="w-full h-full object-cover"
           />
         </div>
@@ -18,6 +18,7 @@
             v-for="img in product.images"
             :key="img"
             :src="img"
+            @click="selectedImage = img"
             class="w-[120px] sm:w-[140px] md:w-[156px] h-[150px] sm:h-[180px] md:h-[195px] rounded-lg object-cover cursor-pointer border border-gray-300 flex-shrink-0"
           />
         </div>
@@ -143,25 +144,29 @@ export default {
 
   setup() {
     const route = useRoute();
-    const productId = route.params.id; // get product ID from URL
+    const productId = route.params.id;
     const qty = ref(1);
+
+    const selectedImage = ref("");
+
     const product = ref({
       title: "",
       price: 0,
       image: "",
       images: [],
       description: [],
-      colors: ["#000000", "#7A1F1F", "#D4A373"], // default colors
+      colors: ["#000000", "#7A1F1F", "#D4A373"],
     });
+
     const reviews = ref([]);
 
-    // Fetch product data dynamically
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
           `https://wig-api.onrender.com/api/products/${productId}`
         );
         const data = res.data.product || res.data;
+
         product.value = {
           title: data.name,
           price: data.price,
@@ -173,6 +178,8 @@ export default {
           colors: data.colors || ["#000000", "#7A1F1F", "#D4A373"],
         };
 
+        selectedImage.value = product.value.images[0];
+
         reviews.value = data.reviews || [];
       } catch (err) {
         console.error("Failed to fetch product:", err);
@@ -182,6 +189,7 @@ export default {
     const increaseQty = () => {
       qty.value++;
     };
+
     const decreaseQty = () => {
       if (qty.value > 1) qty.value--;
     };
@@ -213,6 +221,7 @@ export default {
       product,
       reviews,
       qty,
+      selectedImage,
       increaseQty,
       decreaseQty,
       addToCart,
