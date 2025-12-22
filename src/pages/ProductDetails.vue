@@ -97,13 +97,28 @@
             Add To Cart
           </button>
 
+          <!-- FIXED FAVORITES BUTTON -->
           <button
-            class="w-12 h-12 flex items-center justify-center rounded-xl border border-[#6A2E18]"
+            @click="toggleFavorite"
+            class="w-12 h-12 flex items-center justify-center rounded-xl border border-[#6A2E18]
+                   hover:bg-[#6A2E18]/10 active:scale-95 transition-all duration-200"
           >
-            <img
-              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
-              class="w-6"
-            />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              class="w-6 transition-colors duration-200"
+              :fill="favorites.includes(productId) ? '#b13f32' : 'transparent'"
+              :stroke="favorites.includes(productId) ? '#b13f32' : '#6A2E18'"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 
+                  7.78l1.06 1.06L12 21.23l7.78-7.78 
+                  1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
+            </svg>
           </button>
         </div>
       </div>
@@ -149,6 +164,8 @@ export default {
 
     const selectedImage = ref("");
 
+    const favorites = ref([]);
+
     const product = ref({
       title: "",
       price: 0,
@@ -186,6 +203,56 @@ export default {
       }
     };
 
+    const loadFavorites = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const res = await axios.get(
+          "https://wig-api.onrender.com/api/favorites",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        favorites.value = res.data.map((f) =>
+          typeof f.productId === "object" ? f.productId._id : f.productId
+        );
+      } catch (err) {
+        console.error("Failed to load favorites:", err);
+      }
+    };
+
+    const toggleFavorite = async () => {
+      const token = localStorage.getItem("token");
+      if (!token)
+        return toast.show("Please log in to favorite items.", "error");
+
+      const isFav = favorites.value.includes(productId);
+
+      try {
+        if (!isFav) {
+          await axios.post(
+            "https://wig-api.onrender.com/api/favorites/add",
+            { productId },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          favorites.value.push(productId);
+          window.dispatchEvent(new Event("favorites-updated"));
+        } else {
+          await axios.delete(
+            `https://wig-api.onrender.com/api/favorites/remove/${productId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          favorites.value = favorites.value.filter(
+            (id) => id !== productId
+          );
+          window.dispatchEvent(new Event("favorites-updated"));
+        }
+      } catch (err) {
+        console.error("Favorites update failed:", err);
+        toast.show("Failed to update favorites.", "error");
+      }
+    };
+
     const increaseQty = () => {
       qty.value++;
     };
@@ -215,16 +282,22 @@ export default {
       }
     };
 
-    onMounted(fetchProduct);
+    onMounted(() => {
+      fetchProduct();
+      loadFavorites();
+    });
 
     return {
       product,
       reviews,
       qty,
       selectedImage,
+      favorites,
       increaseQty,
       decreaseQty,
       addToCart,
+      toggleFavorite,
+      productId,
     };
   },
 };

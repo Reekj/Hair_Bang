@@ -61,7 +61,13 @@
             <template v-if="isLoggedIn">
               <div class="px-4 py-2 text-sm text-[#333] border-b">
                 <p class="font-semibold">{{ user?.name }}</p>
-                <p class="text-xs text-gray-500">{{ user?.email }}</p>
+                <p
+                  class="text-xs text-gray-500 truncate max-w-[140px]"
+                  :title="user?.email"
+                >
+                  {{ user?.email }}
+                </p>
+
               </div>
               <RouterLink
                 v-if="user?.isAdmin"
