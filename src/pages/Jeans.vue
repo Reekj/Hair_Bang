@@ -41,6 +41,31 @@
           <option value="priceHigh">Price: High to Low</option>
           <option value="latest">Latest</option>
         </select>
+
+        <select
+          class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md"
+          v-model="selectedColor"
+        >
+          <option value="">All Colors</option>
+          <option v-for="color in availableColors" :key="color" :value="color">
+            {{ color }}
+          </option>
+        </select>
+
+        <!-- Length Filter -->
+        <select
+          class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md"
+          v-model="selectedLength"
+        >
+          <option value="">All Lengths</option>
+          <option
+            v-for="length in availableLengths"
+            :key="length"
+            :value="length"
+          >
+            {{ length }}"
+          </option>
+        </select>
       </div>
 
       <!-- Search Box -->
@@ -153,13 +178,15 @@ export default {
       error: null,
       search: "",
       sortBy: "popular", // default
+      selectedColor: "",
+      selectedLength: "",
     };
   },
   computed: {
     filteredProducts() {
       let filtered = this.products;
 
-      // Search filter
+      // 🔍 Search
       if (this.search) {
         const q = this.search.toLowerCase().trim();
         filtered = filtered.filter(
@@ -169,19 +196,54 @@ export default {
         );
       }
 
-      // Sorting
+      // 🎨 Color filter
+      if (this.selectedColor) {
+        filtered = filtered.filter(
+          (p) => p.color?.toLowerCase() === this.selectedColor
+        );
+      }
+
+      // 📏 Length filter
+      if (this.selectedLength) {
+        filtered = filtered.filter(
+          (p) => p.length?.toLowerCase() === this.selectedLength
+        );
+      }
+
+      // ↕ Sorting
       if (this.sortBy === "priceLow") {
         filtered = filtered.slice().sort((a, b) => a.price - b.price);
       } else if (this.sortBy === "priceHigh") {
         filtered = filtered.slice().sort((a, b) => b.price - a.price);
       } else if (this.sortBy === "latest") {
-        // Assuming your API provides a `createdAt` field
         filtered = filtered
           .slice()
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       }
 
       return filtered;
+    },
+
+    availableColors() {
+      return [
+        ...new Set(
+          this.products
+            .map((p) => p.color)
+            .filter(Boolean)
+            .map((c) => c.toLowerCase())
+        ),
+      ].sort();
+    },
+
+    availableLengths() {
+      return [
+        ...new Set(
+          this.products
+            .map((p) => p.length)
+            .filter(Boolean)
+            .map((l) => l.toLowerCase())
+        ),
+      ].sort((a, b) => Number(a) - Number(b));
     },
   },
   async mounted() {
@@ -259,7 +321,8 @@ export default {
 
     async toggleFavorite(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return toast.show("Please log in to favorite items.", "error");
+      if (!token)
+        return toast.show("Please log in to favorite items.", "error");
 
       const isFav = this.favorites.includes(productId);
 

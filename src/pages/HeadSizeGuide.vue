@@ -18,8 +18,11 @@
           <button @click="scrollToSection('chart')" class="bg-[#B13F32] text-white px-4 py-2 rounded-md hover:opacity-90 transition">
             Size Chart
           </button>
-          <button @click="scrollToSection('faq')" class="bg-[#B13F32] text-white px-4 py-2 rounded-md hover:opacity-90 transition">
-            FAQ
+          <button  class="bg-[#B13F32] text-white px-4 py-2 rounded-md hover:opacity-90 transition">
+            <RouterLink to="/FAQ">
+              FAQ
+            </RouterLink>
+            
           </button>
         </div>
       </section>
@@ -129,6 +132,8 @@
   </template>
   
   <script>
+import { RouterLink } from 'vue-router';
+
   export default {
     name: "HeadSizeGuidePage",
     data() {
