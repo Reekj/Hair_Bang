@@ -22,7 +22,7 @@
         <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 mb-4">
           <img
-            :src="item.product.image"
+            :src="item.product.images?.[0] || ''"
             class="w-full h-full object-cover rounded-xl"
           />
         </div>
@@ -36,11 +36,11 @@
 
         <!-- Price -->
         <p class="text-[#6A2E18] font-medium text-lg sm:text-[20px] mt-2 px-4">
-          ₦{{ (item.product.price * item.quantity).toLocaleString() }}
+          ${{ item.product.price.toLocaleString() }}
         </p>
 
         <!-- Quantity Controls -->
-        <div class="flex items-center justify-center gap-3 mt-2 px-4">
+        <div class="flex items-center justify-center gap-3 mt-2 mb-6 px-4">
           <button
             @click="updateQuantity(item.product._id, item.quantity - 1)"
             class="px-3 py-1 bg-gray-300 rounded-md text-[#6A2E18] font-semibold"
@@ -80,7 +80,7 @@
       class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 flex flex-col md:flex-row justify-between items-center gap-4"
     >
       <p class="text-[#6A2E18] font-semibold text-lg">
-        Total: ₦{{ totalPrice.toLocaleString() }}
+        Total: ${{ totalPrice.toLocaleString() }}
       </p>
 
       <button
@@ -97,6 +97,7 @@
 <script>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
+import { toast } from "../stores/toast.js";
 
 export default {
   name: "Cart",
@@ -124,14 +125,24 @@ export default {
         else if (Array.isArray(res.data.items)) raw = res.data.items;
         else if (Array.isArray(res.data.cartItems)) raw = res.data.cartItems;
 
-        // Filter out invalid/null product entries
         cartItems.value = raw
           .filter((item) => item && item.productId && item.productId._id)
-          .map((item) => ({
-            _id: item._id,
-            quantity: item.quantity ?? 1,
-            product: item.productId,
-          }));
+          .map((item) => {
+            const product = item.productId;
+
+            return {
+              _id: item._id,
+              quantity: item.quantity ?? 1,
+              product: {
+                ...product,
+                displayImage:
+                  product.image ||
+                  (Array.isArray(product.images) && product.images.length
+                    ? product.images[0]
+                    : "https://via.placeholder.com/400x400"),
+              },
+            };
+          });
       } catch (err) {
         console.error("Failed to fetch cart:", err);
       }
@@ -154,7 +165,7 @@ export default {
         if (item) item.quantity = newQuantity;
       } catch (err) {
         console.error("Failed to update quantity:", err);
-        alert("Could not update quantity.");
+        toast.show("Could not update item quantity.", "error");
       }
     };
 
@@ -173,7 +184,7 @@ export default {
         );
       } catch (err) {
         console.error("Failed to remove item:", err);
-        alert("Could not remove item.");
+        toast.show("Could not remove item from cart.", "error");
       }
     };
 
@@ -188,13 +199,11 @@ export default {
     );
 
     /** ----------------------------
-     * CHECKOUT
+     * CHECKOUT (Paystack Init)
      ----------------------------- */
-    /** ----------------------------
- * CHECKOUT (Paystack Init)
- ----------------------------- */
     const checkout = () => {
-      if (!cartItems.value.length) return alert("Cart empty");
+      if (!cartItems.value.length)
+        return toast.show("Your cart is empty.", "info");
 
       const handler = PaystackPop.setup({
         key: "pk_test_77963b9442b15cc08d342806983cf5067092ad28",
@@ -210,7 +219,7 @@ export default {
           handlePaymentSuccess(response);
         },
         onClose: function () {
-          alert("Payment closed");
+          toast.show("Payment cancelled.", "info");
         },
       });
 
@@ -219,7 +228,7 @@ export default {
 
     async function handlePaymentSuccess(response) {
       try {
-        const res = await axios.get(
+        await axios.get(
           `https://wig-api.onrender.com/api/paystack/verify/${response.reference}`,
           {
             headers: {
@@ -228,12 +237,18 @@ export default {
           }
         );
 
-        alert("Payment successful!");
+        toast.show(
+          "Payment successful! Thank you for your purchase.",
+          "success"
+        );
         cartItems.value = [];
         window.location.href = "/cart";
       } catch (err) {
         console.error(err);
-        alert("Payment verified, but could not update cart");
+        toast.show(
+          "Payment verification failed. Please contact support.",
+          "error"
+        );
       }
     }
 
@@ -264,4 +279,3 @@ export default {
   box-sizing: border-box;
 }
 </style>
-``

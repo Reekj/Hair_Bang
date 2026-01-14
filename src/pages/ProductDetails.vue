@@ -4,15 +4,21 @@
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10">
       <!-- LEFT: MAIN IMAGE + THUMBS -->
       <div>
-        <div class="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[854px] bg-white rounded-xl overflow-hidden shadow">
-          <img :src="product.image" class="w-full h-full object-cover" />
+        <div
+          class="w-full h-[400px] sm:h-[500px] md:h-[600px] lg:h-[854px] bg-white rounded-xl overflow-hidden shadow"
+        >
+          <img
+            :src="selectedImage || 'https://via.placeholder.com/600x800'"
+            class="w-full h-full object-cover"
+          />
         </div>
 
         <div class="flex gap-4 mt-4 overflow-x-auto">
-          <img 
-            v-for="img in product.images" 
-            :key="img" 
+          <img
+            v-for="img in product.images"
+            :key="img"
             :src="img"
+            @click="selectedImage = img"
             class="w-[120px] sm:w-[140px] md:w-[156px] h-[150px] sm:h-[180px] md:h-[195px] rounded-lg object-cover cursor-pointer border border-gray-300 flex-shrink-0"
           />
         </div>
@@ -25,7 +31,7 @@
         </h1>
 
         <div class="flex gap-[290px] flex-row">
-          <p class="text-2xl sm:text-3xl text-[#6A2E18] font-normal mt-2 ">
+          <p class="text-2xl sm:text-3xl text-[#6A2E18] font-normal mt-2">
             ${{ product.price }}
           </p>
           <div class="flex justify-end gap-4 items-right mt-1">
@@ -34,7 +40,9 @@
           </div>
         </div>
 
-        <ul class="mt-4 text-[#6A2E18] space-y-2 text-sm sm:text-base md:text-lg leading-relaxed">
+        <ul
+          class="mt-4 text-[#6A2E18] space-y-2 text-sm sm:text-base md:text-lg leading-relaxed"
+        >
           <li v-for="(line, index) in product.description" :key="index">
             • {{ line }}
           </li>
@@ -42,18 +50,39 @@
 
         <!-- QUANTITY -->
         <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-4">
-          <p class="text-[#6A2E18] font-medium text-lg sm:text-xl md:text-2xl">Quantity :</p>
+          <p class="text-[#6A2E18] font-medium text-lg sm:text-xl md:text-2xl">
+            Quantity :
+          </p>
           <div class="flex items-center gap-4 flex-wrap">
-            <div class="w-full sm:w-[200px] md:w-[250px] lg:w-[322px] h-14 sm:h-[70px] md:h-[85px] flex items-center justify-between border border-gray-400 rounded-full px-4 sm:px-6">
-              <button @click="decreaseQty" class="text-2xl sm:text-3xl font-normal">−</button>
-              <p class="text-xl sm:text-2xl md:text-3xl font-semibold text-center w-full">{{ qty }}</p>
-              <button @click="increaseQty" class="text-2xl sm:text-3xl font-normal">+</button>
+            <div
+              class="w-full sm:w-[200px] md:w-[250px] lg:w-[322px] h-14 sm:h-[70px] md:h-[85px] flex items-center justify-between border border-gray-400 rounded-full px-4 sm:px-6"
+            >
+              <button
+                @click="decreaseQty"
+                class="text-2xl sm:text-3xl font-normal"
+              >
+                −
+              </button>
+              <p
+                class="text-xl sm:text-2xl md:text-3xl font-semibold text-center w-full"
+              >
+                {{ qty }}
+              </p>
+              <button
+                @click="increaseQty"
+                class="text-2xl sm:text-3xl font-normal"
+              >
+                +
+              </button>
             </div>
 
             <div class="flex gap-3">
-              <span class="w-4 h-4 rounded-full bg-black cursor-pointer"></span>
-              <span class="w-4 h-4 rounded-full bg-[#7A1F1F] cursor-pointer"></span>
-              <span class="w-4 h-4 rounded-full bg-[#D4A373] cursor-pointer"></span>
+              <span
+                v-for="color in product.colors"
+                :key="color"
+                :style="{ backgroundColor: color }"
+                class="w-4 h-4 rounded-full cursor-pointer"
+              ></span>
             </div>
           </div>
         </div>
@@ -63,13 +92,18 @@
           <button
             @click="addToCart"
             class="flex-1 h-12 sm:h-14 rounded-xl text-white font-medium text-lg sm:text-xl"
-            style="background: linear-gradient(90deg, #B13F32 0%, #4B1B15 100%)"
+            style="background: linear-gradient(90deg, #b13f32 0%, #4b1b15 100%)"
           >
             Add To Cart
           </button>
 
-          <button class="w-12 h-12 flex items-center justify-center rounded-xl border border-[#6A2E18]">
-            <img src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png" class="w-6" />
+          <button
+            class="w-12 h-12 flex items-center justify-center rounded-xl border border-[#6A2E18]"
+          >
+            <img
+              src="https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/mdi-light_heart.png"
+              class="w-6"
+            />
           </button>
         </div>
       </div>
@@ -80,9 +114,19 @@
       <h2 class="text-2xl sm:text-3xl text-[#6A2E18] font-semibold">Reviews</h2>
       <p class="text-[#6A2E18] opacity-80 mb-6">{{ reviews.length }} reviews</p>
       <div class="flex flex-col space-y-6">
-        <div v-for="(review, index) in reviews" :key="index" class="bg-none rounded-xl p-6 w-full">
-          <p class="text-[#6A2E18] font-medium text-[28px] sm:text-xl mb-2">★★★★★</p>
-          <p class="text-[#6A2E18] text-[28px] sm:text-base leading-relaxed font-medium">{{ review }}</p>
+        <div
+          v-for="(review, index) in reviews"
+          :key="index"
+          class="bg-none rounded-xl p-6 w-full"
+        >
+          <p class="text-[#6A2E18] font-medium text-[28px] sm:text-xl mb-2">
+            ★★★★★
+          </p>
+          <p
+            class="text-[#6A2E18] text-[28px] sm:text-base leading-relaxed font-medium"
+          >
+            {{ review }}
+          </p>
         </div>
       </div>
     </div>
@@ -90,78 +134,99 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+import { ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { toast } from "../stores/toast";
 
 export default {
   name: "ProductDetails",
 
-  data() {
-    return {
-      qty: 1,
-      product: {
-        title: "Luxury 16 Body Wave Raw Hair",
-        price: 299,
-        image: "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png",
-        images: [
-          "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/misc/homepagehair3.png",
-          "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair3.jpg",
-          "https://dkcxshokjuwsqtuaycry.supabase.co/storage/v1/object/public/Car_Rankings_Data/hhb_images/Wigs/hair2.png"
-        ],
-        description: [
-          "Pre-bleached knots",
-          "Pre-styled as pictured",
-          "Picture is the exact product",
-          "Sleek, Smooth Texture",
-          "Versatile Styling",
-          "Durable and Long-lasting",
-          "Blends Seamlessly",
-          "Available in Various Colors and Lengths"
-        ],
-        id: 1
-      },
-      reviews: [
-        "Absolutely love this wig! The quality is amazing and it looks so natural. I've gotten compliments all day!",
-        "Worth every naira. It's full, true to length, and arrived exactly as described.",
-        "The wig exceeded my expectations. Lightweight, comfortable, and looks just like my natural hair."
-      ]
-    };
-  },
+  setup() {
+    const route = useRoute();
+    const productId = route.params.id;
+    const qty = ref(1);
 
-  methods: {
-    increaseQty() {
-      this.qty++;
-    },
-    decreaseQty() {
-      if (this.qty > 1) this.qty--;
-    },
+    const selectedImage = ref("");
 
-    async addToCart() {
+    const product = ref({
+      title: "",
+      price: 0,
+      image: "",
+      images: [],
+      description: [],
+      colors: ["#000000", "#7A1F1F", "#D4A373"],
+    });
+
+    const reviews = ref([]);
+
+    const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem("token"); // user must be logged in
+        const res = await axios.get(
+          `https://wig-api.onrender.com/api/products/${productId}`
+        );
+        const data = res.data.product || res.data;
+
+        product.value = {
+          title: data.name,
+          price: data.price,
+          images:
+            data.images && data.images.length ? data.images : [data.image],
+          description: Array.isArray(data.description)
+            ? data.description
+            : [data.description || ""],
+          colors: data.colors || ["#000000", "#7A1F1F", "#D4A373"],
+        };
+
+        selectedImage.value = product.value.images[0];
+
+        reviews.value = data.reviews || [];
+      } catch (err) {
+        console.error("Failed to fetch product:", err);
+      }
+    };
+
+    const increaseQty = () => {
+      qty.value++;
+    };
+
+    const decreaseQty = () => {
+      if (qty.value > 1) qty.value--;
+    };
+
+    const addToCart = async () => {
+      try {
+        const token = localStorage.getItem("token");
         if (!token) {
-          alert("Please log in to add items to your cart.");
+          toast.show("Please log in to add items to cart.", "error");
           return;
         }
 
-        const payload = {
-          productId: this.product.id.toString(),
-          quantity: this.qty
-        };
-
-        await axios.post("https://wig-api.onrender.com/api/cart/add", payload, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-
-        alert("Added to cart successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to add to cart. Please try again.");
+        await axios.post(
+          "https://wig-api.onrender.com/api/cart/add",
+          { productId, quantity: qty.value },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.show("Product added to cart!", "success");
+        window.dispatchEvent(new Event("cart-updated"));
+      } catch (err) {
+        console.error(err);
+        toast.show("Failed to add product to cart.", "error");
       }
-    }
-  }
+    };
+
+    onMounted(fetchProduct);
+
+    return {
+      product,
+      reviews,
+      qty,
+      selectedImage,
+      increaseQty,
+      decreaseQty,
+      addToCart,
+    };
+  },
 };
 </script>
 

@@ -1,13 +1,11 @@
 <template>
   <div class="min-h-screen w-full py-10">
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 px-4">
-
       <!-- LEFT: Contact Form -->
       <div class="bg-white shadow-lg rounded-xl p-6">
         <h2 class="text-2xl font-semibold mb-6">Contact Us</h2>
 
         <form @submit.prevent="submitForm" class="space-y-4">
-
           <div>
             <label class="block mb-1 font-medium">Full Name</label>
             <input
@@ -47,7 +45,6 @@
           >
             Send Message
           </button>
-
         </form>
       </div>
 
@@ -64,13 +61,13 @@
           ></iframe>
         </div>
       </div>
-
     </div>
   </div>
 </template>
 
 <script setup>
 import { reactive } from "vue";
+import { toast } from "../stores/toast.js";
 
 const form = reactive({
   name: "",
@@ -78,8 +75,23 @@ const form = reactive({
   message: "",
 });
 
-const submitForm = () => {
-  console.log("Form submitted:", form);
-  alert("Message sent!");
+const submitForm = async () => {
+  try {
+    await fetch("https://wig-api.onrender.com/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    toast.show("Your message has been sent successfully!", "success");
+
+    form.name = "";
+    form.email = "";
+    form.message = "";
+  } catch (error) {
+    toast.show("Something went wrong. Please try again.", "error");
+  }
 };
 </script>
