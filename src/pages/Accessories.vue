@@ -41,7 +41,18 @@
           <option value="priceHigh">Price: High to Low</option>
           <option value="latest">Latest</option>
         </select>
+
+        <select
+        class="filter-select w-full sm:w-[160px] h-[43px] text-[#6A2E18CC] rounded-md"
+        v-model="selectedColor"
+      >
+        <option value="">All Colors</option>
+        <option v-for="color in availableColors" :key="color" :value="color">
+          {{ color }}
+        </option>
+      </select>
       </div>
+      
 
       <!-- Search Box -->
       <div class="relative w-full sm:w-[265px] min-w-0 mt-3 sm:mt-0">
@@ -161,6 +172,7 @@ export default {
       error: null,
       search: "",
       sortBy: "popular", // default
+      selectedColor: "",
     };
   },
   computed: {
@@ -190,6 +202,16 @@ export default {
       }
 
       return filtered;
+    },
+    availableColors() {
+      return [
+        ...new Set(
+          this.products
+            .map((p) => p.color)
+            .filter(Boolean)
+            .map((c) => c.toLowerCase())
+        ),
+      ].sort();
     },
   },
   async mounted() {
@@ -224,7 +246,8 @@ export default {
 
     async addToCart(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return toast.show("Please log in to add items to cart.", "error");
+      if (!token)
+        return toast.show("Please log in to add items to cart.", "error");
 
       try {
         const res = await axios.post(
@@ -269,7 +292,8 @@ export default {
 
     async toggleFavorite(productId) {
       const token = localStorage.getItem("token");
-      if (!token) return toast.show("Please log in to favorite items.", "error");
+      if (!token)
+        return toast.show("Please log in to favorite items.", "error");
 
       const isFav = this.favorites.includes(productId);
 

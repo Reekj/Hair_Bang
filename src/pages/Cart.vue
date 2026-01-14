@@ -22,7 +22,7 @@
         <!-- Image -->
         <div class="relative w-full h-64 sm:h-72 md:h-80 mb-4">
           <img
-            :src="item.product.displayImage"
+            :src="item.product.images?.[0] || ''"
             class="w-full h-full object-cover rounded-xl"
           />
         </div>

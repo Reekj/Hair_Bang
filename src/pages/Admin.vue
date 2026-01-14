@@ -8,98 +8,114 @@
 
       <form @submit.prevent="editMode ? updateProduct() : addProduct()">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Name -->
           <div>
             <label class="block font-semibold">Name</label>
-            <input
-              v-model="form.name"
-              type="text"
-              class="w-full border p-2 rounded"
-              required
-            />
+            <input v-model="form.name" type="text" class="input" required />
           </div>
 
+          <!-- Price -->
           <div>
             <label class="block font-semibold">Price</label>
-            <input
-              v-model.number="form.price"
-              type="number"
-              class="w-full border p-2 rounded"
-              required
-            />
+            <input v-model.number="form.price" type="number" class="input" required />
           </div>
 
+          <!-- Discount -->
           <div>
-            <label class="block font-semibold"
-              >Discounted Price (optional)</label
-            >
+            <label class="block font-semibold">Discounted Price</label>
             <input
               v-model.number="form.discountedPrice"
               type="number"
-              class="w-full border p-2 rounded"
+              class="input"
               min="0"
             />
           </div>
 
+          <!-- Length -->
           <div>
-            <label class="block font-semibold">Product Image</label>
+            <label class="block font-semibold">Length (inches)</label>
+            <input
+              v-model.number="form.length"
+              type="number"
+              class="input"
+              placeholder="e.g. 12, 14, 16"
+            />
+          </div>
+
+          <!-- Color -->
+          <div>
+            <label class="block font-semibold">Color</label>
+            <input
+              v-model="form.color"
+              type="text"
+              class="input"
+              placeholder="Black, Brown, Blonde"
+            />
+          </div>
+
+          <!-- Texture -->
+          <div>
+            <label class="block font-semibold">Texture</label>
+            <select v-model="form.texture" class="input">
+              <option value="">Select texture</option>
+              <option value="straight">Straight</option>
+              <option value="body wave">Body Wave</option>
+              <option value="curly">Curly</option>
+              <option value="deep wave">Deep Wave</option>
+              <option value="water wave">Water Wave</option>
+            </select>
+          </div>
+
+          <!-- Images -->
+          <div>
+            <label class="block font-semibold">Images</label>
             <input
               type="file"
-              @change="handleMultipleFiles"
-              class="w-full border p-2 rounded"
-              accept="image/*"
               multiple
+              accept="image/*"
+              class="input"
+              @change="handleMultipleFiles"
             />
           </div>
 
-          <div class="md:col-span-2">
-            <label class="block font-semibold">Description</label>
-            <textarea
-              v-model="form.description"
-              class="w-full border p-2 rounded"
-              required
-            ></textarea>
-          </div>
-
+          <!-- Quantity -->
           <div>
             <label class="block font-semibold">Quantity</label>
-            <input
-              v-model.number="form.quantity"
-              type="number"
-              class="w-full border p-2 rounded"
-              min="0"
-              required
-            />
+            <input v-model.number="form.quantity" type="number" min="0" class="input" />
           </div>
 
+          <!-- Category -->
           <div>
             <label class="block font-semibold">Category</label>
-            <select
-              v-model="form.category"
-              class="w-full border p-2 rounded"
-              required
-            >
-              <option value="" disabled>Select a category</option>
-              <option v-for="cat in categories" :key="cat._id" :value="cat._id">
-                {{ cat.name }}
+            <select v-model="form.category" class="input" required>
+              <option value="" disabled>Select category</option>
+              <option v-for="c in categories" :key="c._id" :value="c._id">
+                {{ c.name }}
               </option>
             </select>
           </div>
+
+          <!-- Description -->
+          <div class="md:col-span-2">
+            <label class="block font-semibold">Description</label>
+            <textarea v-model="form.description" class="input" rows="3" />
+          </div>
         </div>
 
-        <div class="mt-4 flex gap-4">
+        <div class="mt-4 flex gap-3">
           <button
             type="submit"
             :disabled="!isDiscountValid"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            class="btn-primary"
           >
             {{ editMode ? "Update" : "Add Product" }}
           </button>
 
           <button
             v-if="editMode"
-            @click="cancelEdit"
             type="button"
-            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            class="btn-secondary"
+            @click="cancelEdit"
           >
             Cancel
           </button>
@@ -111,76 +127,34 @@
     <div class="bg-white p-4 rounded shadow">
       <h2 class="text-xl font-bold mb-4">Product List</h2>
 
-      <div v-if="loading">Loading products...</div>
-      <div v-if="error" class="text-red-600">{{ error }}</div>
-
-      <table v-if="products.length" class="w-full border-collapse">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border p-2">Image</th>
-            <th class="border p-2">Name</th>
-            <th class="border p-2">Price</th>
-            <th class="border p-2">Discounted Price</th>
-            <th class="border p-2">Description</th>
-            <th class="border p-2">Category</th>
-            <th class="border p-2">Stock</th>
-            <th class="border p-2">Actions</th>
+      <table v-if="products.length" class="w-full border-collapse text-sm">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="th">Image</th>
+            <th class="th">Name</th>
+            <th class="th">Price</th>
+            <th class="th">Length</th>
+            <th class="th">Color</th>
+            <th class="th">Texture</th>
+            <th class="th">Qty</th>
+            <th class="th">Actions</th>
           </tr>
         </thead>
 
         <tbody>
           <tr v-for="p in products" :key="p._id">
-            <td class="border p-2">
-              <img :src="p.images[0]" class="h-16 w-16 object-cover rounded" />
+            <td class="td">
+              <img :src="p.images[0]" class="h-12 w-12 object-cover rounded" />
             </td>
-            <td class="border p-2">{{ p.name }}</td>
-            <td class="border p-2">₦{{ p.price }}</td>
-            <td class="border p-2">
-              <div v-if="p.discountedPrice !== null">
-                <span class="line-through text-gray-400"> ₦{{ p.price }} </span>
-                <br />
-                <span class="text-green-600 font-bold">
-                  ₦{{ p.discountedPrice }}
-                </span>
-                <span class="text-xs text-red-600 font-semibold">
-                  {{
-                    Math.round(((p.price - p.discountedPrice) / p.price) * 100)
-                  }}% OFF
-                </span>
-              </div>
-              <span v-else>₦{{ p.price }}</span>
-            </td>
-
-            <td class="border p-2">{{ p.description }}</td>
-            <td class="border p-2">
-              {{ p.category?.name || "No Category" }}
-            </td>
-            <td class="border p-2">
-              <span class="font-semibold">Qty: {{ p.quantity }}</span
-              ><br />
-              <span
-                :class="{
-                  'text-green-600': p.status === 'in stock',
-                  'text-yellow-600': p.status === 'low stock',
-                  'text-red-600': p.status === 'out of stock',
-                  'font-semibold': true,
-                }"
-              >
-                {{ p.status }}
-              </span>
-            </td>
-
-            <td class="border p-2 space-x-2">
-              <button
-                @click="editProduct(p)"
-                class="px-2 py-1 bg-yellow-500 text-white rounded"
-              >
-                Edit
-              </button>
-              <button
-                @click="deleteProduct(p._id)"
-                class="px-2 py-1 bg-red-600 text-white rounded"
-              >
+            <td class="td">{{ p.name }}</td>
+            <td class="td">₦{{ p.price }}</td>
+            <td class="td">{{ p.length || "-" }}</td>
+            <td class="td capitalize">{{ p.color || "-" }}</td>
+            <td class="td capitalize">{{ p.texture || "-" }}</td>
+            <td class="td">{{ p.quantity }}</td>
+            <td class="td space-x-2">
+              <button class="btn-edit" @click="editProduct(p)">Edit</button>
+              <button class="btn-delete" @click="deleteProduct(p._id)">
                 Delete
               </button>
             </td>
@@ -188,36 +162,34 @@
         </tbody>
       </table>
 
-      <div v-else class="text-gray-500">No products available.</div>
+      <div v-else class="text-gray-500">No products found.</div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import axios from "axios";
 import { toast } from "../stores/toast";
 
-// API URLS
 const BASE_URL = "https://wig-api.onrender.com/api/products";
 
-// States
 const products = ref([]);
-const loading = ref(false);
-const error = ref(null);
+const categories = ref([]);
 const editMode = ref(false);
 const editingId = ref(null);
-const categories = ref([]);
 
-// Form state
 const form = ref({
   name: "",
-  price: "",
+  price: null,
   discountedPrice: null,
   images: [],
   description: "",
   category: "",
   quantity: 0,
+  length: null,
+  color: "",
+  texture: "",
 });
 
 const isDiscountValid = computed(() => {
@@ -227,148 +199,100 @@ const isDiscountValid = computed(() => {
   );
 });
 
-// Load products
 const loadProducts = async () => {
-  loading.value = true;
-  try {
-    const res = await axios.get(BASE_URL);
-    products.value = res.data;
-  } catch (err) {
-    error.value = "Failed to load products";
-  } finally {
-    loading.value = false;
-  }
+  const res = await axios.get(BASE_URL);
+  products.value = res.data.products || res.data;
 };
 
 const loadCategories = async () => {
-  try {
-    const res = await axios.get("https://wig-api.onrender.com/api/categories");
-    categories.value = res.data; // must return [{ _id, name, slug }]
-  } catch (err) {
-    console.error("Failed to load categories");
-  }
+  const res = await axios.get("https://wig-api.onrender.com/api/categories");
+  categories.value = res.data;
 };
 
-// Add product
 const addProduct = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await axios.post(`${BASE_URL}/new`, form.value, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    products.value.push(res.data.product); // Add newly created item with _id
-    toast.show("Product added successfully", "success");
-    resetForm();
-  } catch (err) {
-    toast.show("Failed to add product", "error");
-  }
+  const token = localStorage.getItem("token");
+  const res = await axios.post(`${BASE_URL}/new`, form.value, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  products.value.unshift(res.data.product);
+  toast.show("Product added", "success");
+  resetForm();
 };
 
-// Fill form for editing
 const editProduct = (p) => {
   editMode.value = true;
   editingId.value = p._id;
-  form.value = {
-    name: p.name,
-    price: p.price,
-    discountedPrice: p.discountedPrice ?? null,
-    images: p.images || [],
-    description: p.description,
-    category: p.category?._id || "",
-    quantity: p.quantity || 0,
-  };
+  form.value = { ...p, category: p.category?._id };
 };
 
-// Cancel editing
+const updateProduct = async () => {
+  const token = localStorage.getItem("token");
+  const res = await axios.put(`${BASE_URL}/${editingId.value}`, form.value, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const index = products.value.findIndex(p => p._id === editingId.value);
+  products.value[index] = res.data.product;
+
+  toast.show("Product updated", "success");
+  cancelEdit();
+};
+
+const deleteProduct = async (id) => {
+  if (!confirm("Delete product?")) return;
+  const token = localStorage.getItem("token");
+  await axios.delete(`${BASE_URL}/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  products.value = products.value.filter(p => p._id !== id);
+};
+
 const cancelEdit = () => {
-  resetForm();
   editMode.value = false;
   editingId.value = null;
+  resetForm();
 };
 
-// Update product
-const updateProduct = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await axios.put(`${BASE_URL}/${editingId.value}`, form.value, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    // Update list
-    const index = products.value.findIndex((p) => p._id === editingId.value);
-    if (index !== -1) products.value[index] = res.data.product;
-
-    cancelEdit();
-    toast.show("Product updated successfully", "success");
-  } catch (err) {
-    toast.show("Failed to update product", "error");
-  }
-};
-
-// Delete product
-const deleteProduct = async (id) => {
-  if (!confirm("Delete this product?")) return;
-
-  try {
-    const token = localStorage.getItem("token");
-    await axios.delete(`${BASE_URL}/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    products.value = products.value.filter((p) => p._id !== id);
-    toast.show("Product deleted successfully", "success");
-  } catch (err) {
-    toast.show("Failed to delete product", "error");
-  }
-};
-
-// Reset form
 const resetForm = () => {
   form.value = {
     name: "",
-    price: "",
+    price: null,
     discountedPrice: null,
     images: [],
     description: "",
     category: "",
     quantity: 0,
+    length: null,
+    color: "",
+    texture: "",
   };
 };
-const handleMultipleFiles = async (event) => {
-  const files = Array.from(event.target.files);
-  const uploadedUrls = [];
 
-  for (const file of files) {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", "unsigned_upload");
-    formData.append("cloud_name", "db0x4d6a8");
-
-    try {
-      const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/db0x4d6a8/image/upload",
-        formData
-      );
-      uploadedUrls.push(res.data.secure_url);
-    } catch (err) {
-      toast.show("Image upload failed for one of the files", "error");
-    }
+const handleMultipleFiles = async (e) => {
+  const uploaded = [];
+  for (const file of e.target.files) {
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("upload_preset", "unsigned_upload");
+    const res = await axios.post(
+      "https://api.cloudinary.com/v1_1/db0x4d6a8/image/upload",
+      fd
+    );
+    uploaded.push(res.data.secure_url);
   }
-
-  form.value.images = uploadedUrls; // save all uploaded URLs
+  form.value.images = uploaded;
 };
-
-
 
 onMounted(loadProducts);
 onMounted(loadCategories);
 </script>
 
 <style>
-/* optional clean styling */
+.input { @apply w-full border p-2 rounded; }
+.th { @apply border p-2 font-semibold; }
+.td { @apply border p-2; }
+.btn-primary { @apply bg-blue-600 text-white px-4 py-2 rounded; }
+.btn-secondary { @apply bg-gray-500 text-white px-4 py-2 rounded; }
+.btn-edit { @apply bg-yellow-500 text-white px-2 py-1 rounded; }
+.btn-delete { @apply bg-red-600 text-white px-2 py-1 rounded; }
 </style>
